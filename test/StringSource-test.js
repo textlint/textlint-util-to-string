@@ -4,6 +4,14 @@ import assert from "power-assert"
 import {parse} from "markdown-to-ast";
 import StringSource from "../src/StringSource";
 describe("StringSource", function () {
+    describe("#toString", function () {
+        it("should concat string", function () {
+            let AST = parse("**str**");
+            let source = new StringSource(AST);
+            assert(source + "!!", "str!!");
+        });
+    });
+
     context("Each Pattern", function () {
         it("Str", function () {
             let AST = parse("**str**");
@@ -152,6 +160,14 @@ describe("StringSource", function () {
             let result = source.toString();
             assert.equal(result, "alt text");
             assert.equal(source.originalPositionFor(1000), null);
+        });
+        it("should return null when -1", function () {
+            var originalText = "![alt](http://example.png) text";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "alt text");
+            assert.equal(source.originalPositionFor(-1), null);
         });
     })
 });
