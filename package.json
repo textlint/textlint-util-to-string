@@ -1,0 +1,28 @@
+{
+  "name": "txtast-util-to-string",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azu/txtast-util-to-string.git"
+  },
+  "author": "azu",
+  "email": "azuciao@gmail.com",
+  "homepage": "https://github.com/azu/txtast-util-to-string",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/azu/txtast-util-to-string/issues"
+  },
+  "version": "1.0.0",
+  "description": "to string util",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "espower-babel": "^4.0.0",
+    "mocha": "^2.3.4",
+    "power-assert": "^1.2.0"
+  }
+}
