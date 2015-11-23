@@ -1,13 +1,13 @@
 // LICENSE : MIT
 "use strict";
 import ObjectAssign from "object-assign";
-export default class Stringify {
+export default class StringSource {
     constructor(node) {
         this.node = node;
         this.tokenMaps = [];
         this.generatedString = "";
         // pre calculate
-        this.stringify(this.node);
+        this._stringify(this.node);
         /*
         [
         // e.g.) **Str**
@@ -23,6 +23,10 @@ export default class Stringify {
             generated : [start, end]
         }]
          */
+    }
+
+    toString() {
+        return this.generatedString;
     }
 
     originalPositionFor(position) {
@@ -126,7 +130,7 @@ export default class Stringify {
      * @param {Node} parent - Parent Node of the `node`.
      * @return {string} - Textual representation.
      */
-    stringify(node, parent) {
+    _stringify(node, parent) {
         let value = this._valueOf(node, parent);
         if (value) {
             return value;
@@ -135,12 +139,8 @@ export default class Stringify {
             return;
         }
         node.children.forEach((childNode) => {
-            let tokenMap = this.stringify(childNode, node);
+            let tokenMap = this._stringify(childNode, node);
             this._addTokenMap(tokenMap);
         });
-    }
-
-    toString() {
-        return this.generatedString;
     }
 }

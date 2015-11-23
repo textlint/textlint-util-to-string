@@ -2,12 +2,12 @@
 "use strict";
 import assert from "power-assert"
 import {parse} from "markdown-to-ast";
-import Stringify from "../src/to-string";
-describe("to-string-test", function () {
+import StringSource from "../src/StringSource";
+describe("StringSource", function () {
     context("Each Pattern", function () {
         it("Str", function () {
             let AST = parse("**str**");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "str");
             assert.equal(source.tokenMaps.length, 1);
@@ -21,7 +21,7 @@ describe("to-string-test", function () {
         });
         it("Str that contain break line", function () {
             let AST = parse("**st\nr**");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "st\nr");
             assert.equal(source.tokenMaps.length, 1);
@@ -35,7 +35,7 @@ describe("to-string-test", function () {
         });
         it("Link", function () {
             let AST = parse("_[link](http://example)");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "_link");
             assert.equal(source.tokenMaps.length, 2);
@@ -56,7 +56,7 @@ describe("to-string-test", function () {
         });
         it("Str + `Code` + Str", function () {
             let AST = parse("text`code`text");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "textcodetext");
             assert.equal(source.tokenMaps.length, 3);
@@ -81,7 +81,7 @@ describe("to-string-test", function () {
         });
         it("Header", function () {
             let AST = parse("# Header");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "Header");
             assert.equal(source.tokenMaps.length, 1);
@@ -94,7 +94,7 @@ describe("to-string-test", function () {
         });
         it("Image + Str", function () {
             let AST = parse("![alt](http://example.png) text");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
             assert.equal(source.tokenMaps.length, 2);
@@ -113,7 +113,7 @@ describe("to-string-test", function () {
         });
         it("confuse pattern", function () {
             let AST = parse("![!](http://example.com)");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "!");
             assert.equal(source.tokenMaps.length, 1);
@@ -126,7 +126,7 @@ describe("to-string-test", function () {
         });
         it("Empty", function () {
             let AST = parse("");
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "");
             assert.equal(source.tokenMaps.length, 0);
@@ -137,7 +137,7 @@ describe("to-string-test", function () {
         it("should return original position for index", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
             var indexOf = result.indexOf("text");
@@ -148,7 +148,7 @@ describe("to-string-test", function () {
         it("should return null when not found position for index", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
-            let source = new Stringify(AST);
+            let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
             assert.equal(source.originalPositionFor(1000), null);
