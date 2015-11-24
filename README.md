@@ -15,17 +15,17 @@ import assert from "power-assert"
 import {parse} from "markdown-to-ast";
 import StringSource from "textlint-util-to-string";
 
-var originalText = "This is [Example！？](http://example.com/)";
+let originalText = "This is [Example！？](http://example.com/)";
 let AST = parse(originalText);
 let source = new StringSource(AST);
 let result = source.toString();
 assert.equal(result, "This is Example！？");
-var index1 = result.indexOf("Example");
+let index1 = result.indexOf("Example");
 assert.equal(index1, 8);
 // 8 -> 9
 // originalText[9];// "E"
 assert.equal(source.originalPositionFor(index1), 9);
-var index2 = result.indexOf("！？");
+let index2 = result.indexOf("！？");
 assert.equal(index2, 15);
 // 15 -> 16
 // originalText[16];// "！"
