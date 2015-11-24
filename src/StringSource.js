@@ -3,11 +3,11 @@
 import ObjectAssign from "object-assign";
 export default class StringSource {
     constructor(node) {
-        this.node = node;
+        this.rootNode = node;
         this.tokenMaps = [];
         this.generatedString = "";
         // pre calculate
-        this._stringify(this.node);
+        this._stringify(this.rootNode);
         /*
         [
         // e.g.) **Str**
@@ -50,6 +50,15 @@ export default class StringSource {
         return hitTokenMap.original[0] + adjustedStart;
     }
 
+
+    isParagraphNode(node) {
+        return node.type === "Paragraph";
+    }
+
+    isStringNode(node) {
+        return node.type === "Str";
+    }
+
     _getValue(node) {
         if (node.value) {
             return node.value;
@@ -77,7 +86,7 @@ export default class StringSource {
             return;
         }
         // <p><Str /></p>
-        if (parent.type === "Paragraph" && node.type === "Str") {
+        if (this.isParagraphNode(parent) && this.isStringNode(node)) {
             return {
                 original: node.range,
                 intermediate: node.range,
@@ -88,7 +97,7 @@ export default class StringSource {
         // => container is <p>
         // <p><strong><Str /></strong></p>
         // => container is <strong>
-        let container = (parent.type === "Paragraph") ? node : parent;
+        let container = this.isParagraphNode(parent) ? node : parent;
         let rawValue = container.raw;
         let paddingLeft = rawValue.indexOf(value, 1); // avoid match ! with ![
         let paddingRight = rawValue.length - (paddingLeft + value.length);
@@ -127,7 +136,7 @@ export default class StringSource {
      * recursivly try its children.
      *
      * @param {Node} node - Node to transform to a string.
-     * @param {Node} parent - Parent Node of the `node`.
+     * @param {Node} [parent] - Parent Node of the `node`.
      * @return {string} - Textual representation.
      */
     _stringify(node, parent) {
