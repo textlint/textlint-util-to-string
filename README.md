@@ -8,14 +8,33 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
     npm install textlint-util-to-string
 
-
 ## Usage
 
-- [ ] Write usage instructions
+```js
+import assert from "power-assert"
+import {parse} from "markdown-to-ast";
+import StringSource from "textlint-util-to-string";
+
+var originalText = "This is [Example！？](http://example.com/)";
+let AST = parse(originalText);
+let source = new StringSource(AST);
+let result = source.toString();
+assert.equal(result, "This is Example！？");
+var index1 = result.indexOf("Example");
+assert.equal(index1, 8);
+// 8 -> 9
+// originalText[9];// "E"
+assert.equal(source.originalPositionFor(index1), 9);
+var index2 = result.indexOf("！？");
+assert.equal(index2, 15);
+// 15 -> 16
+// originalText[16];// "！"
+assert.equal(source.originalPositionFor(index2), 16);
+```
 
 ## Tests
 
-- [ ] Write How to Tests
+    npm test
 
 ## Contributing
 
