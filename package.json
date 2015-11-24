@@ -36,6 +36,7 @@
     "power-assert": "^1.2.0"
   },
   "dependencies": {
-    "object-assign": "^4.0.1"
+    "object-assign": "^4.0.1",
+    "structured-source": "^3.0.2"
   }
 }

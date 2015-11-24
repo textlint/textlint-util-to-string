@@ -1,6 +1,7 @@
 // LICENSE : MIT
 "use strict";
 import ObjectAssign from "object-assign";
+import StructuredSource from "structured-source";
 export default class StringSource {
     constructor(node) {
         this.rootNode = node;
@@ -8,6 +9,8 @@ export default class StringSource {
         this.generatedString = "";
         // pre calculate
         this._stringify(this.rootNode);
+        this.originalSource = new StructuredSource(this.rootNode.raw);
+        this.generatedSource = new StructuredSource(this.generatedString);
         /*
         [
         // e.g.) **Str**
@@ -31,13 +34,13 @@ export default class StringSource {
 
     /**
      * Pass index value and return original index value.
-     * @param {number} position - position is a index value.
+     * @param {number} targetIndex - position is a index value.
      * @returns {number|undefined} original
      */
-    originalPositionFor(position) {
+    originalIndexFor(targetIndex) {
         let hitTokenMaps = this.tokenMaps.filter(tokenMap => {
             let generated = tokenMap.generated;
-            if (generated[0] <= position && position < generated[1]) {
+            if (generated[0] <= targetIndex && targetIndex < generated[1]) {
                 return true;
             }
         });
@@ -54,9 +57,22 @@ export default class StringSource {
         // <----------->\[<------------->|text]
         //              ^        ^
         //   position-generated  intermediate-origin
-        let outAdjust = position - hitTokenMap.generated[0];
+        let outAdjust = targetIndex - hitTokenMap.generated[0];
         let inAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
         return outAdjust + inAdjust + hitTokenMap.original[0];
+    }
+
+    originalPositionFor(position) {
+        if (typeof position.line === "undefined" || typeof position.column === "undefined") {
+            throw new Error("position.{line, column} should not undefined: " + JSON.stringify(position));
+        }
+        var generatedIndex = this.generatedSource.positionToIndex(position);
+        if (isNaN(generatedIndex)) {
+            // Not Found
+            return;
+        }
+        let originalIndex = this.originalIndexFor(generatedIndex);
+        return this.originalSource.indexToPosition(originalIndex);
     }
 
 
@@ -158,7 +174,9 @@ export default class StringSource {
         }
         node.children.forEach((childNode) => {
             let tokenMap = this._stringify(childNode, node);
-            this._addTokenMap(tokenMap);
+            if (tokenMap) {
+                this._addTokenMap(tokenMap);
+            }
         });
     }
 }

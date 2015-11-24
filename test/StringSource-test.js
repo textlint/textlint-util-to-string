@@ -141,8 +141,8 @@ describe("StringSource", function () {
         });
     });
 
-    describe("#originalPositionFor", function () {
-        it("Str + Lint", function () {
+    describe("#originalIndexFor", function () {
+        it("Str + Link", function () {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -150,10 +150,10 @@ describe("StringSource", function () {
             assert.equal(result, "This is Example！？");
             var index1 = result.indexOf("Example");
             assert.equal(index1, 8);
-            assert.equal(source.originalPositionFor(index1), 9);
+            assert.equal(source.originalIndexFor(index1), 9);
             var index2 = result.indexOf("！？");
             assert.equal(index2, 15);
-            assert.equal(source.originalPositionFor(index2), 16);
+            assert.equal(source.originalIndexFor(index2), 16);
         });
         it("should return original position for index", function () {
             var originalText = "![alt](http://example.png) text";
@@ -163,7 +163,7 @@ describe("StringSource", function () {
             assert.equal(result, "alt text");
             var indexOf = result.indexOf("text");
             assert.equal(indexOf, 4);
-            assert.deepEqual(source.originalPositionFor(indexOf), 27);
+            assert.deepEqual(source.originalIndexFor(indexOf), 27);
             assert.equal(originalText.slice(27), "text");
         });
         it("should return null when not found position for index", function () {
@@ -172,7 +172,7 @@ describe("StringSource", function () {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalPositionFor(1000), null);
+            assert.equal(source.originalIndexFor(1000), null);
         });
         it("should return null when -1", function () {
             var originalText = "![alt](http://example.png) text";
@@ -180,7 +180,68 @@ describe("StringSource", function () {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalPositionFor(-1), null);
+            assert.equal(source.originalIndexFor(-1), null);
+        });
+    });
+    describe("#originalPositionFor", function () {
+        it("Str + Link", function () {
+            var originalText = "This is [Example！？](http://example.com/)";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "This is Example！？");
+            assert.deepEqual(source.originalPositionFor({
+                line: 1,
+                column: 8
+            }), {
+                line: 1,
+                column: 9
+            });
+            assert.deepEqual(source.originalPositionFor({
+                line: 1,
+                column: 15
+            }), {
+                line: 1,
+                column: 16
+            });
+        });
+        it("should return original position for index", function () {
+            var originalText = "First\n![alt](http://example.png) text";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "First\nalt text");
+            // 4
+            var lines = result.split("\n");
+            var indexOf = lines[1].indexOf("text");
+            assert.deepEqual(source.originalPositionFor({
+                line: lines.length,
+                column: indexOf
+            }), {
+                line: 2,
+                column: 27
+            });
+        });
+        it("should return null when not found position for index", function () {
+            var originalText = "![alt](http://example.png) text";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "alt text");
+            assert.equal(source.originalPositionFor({
+                line: -1,
+                column: -1
+            }), null);
+        });
+        it("should throw error when position is not object", function () {
+            var originalText = "![alt](http://example.png) text";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "alt text");
+            assert.throws(function () {
+                source.originalPositionFor();
+            });
         });
     })
 });
