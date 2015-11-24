@@ -3,6 +3,7 @@
 import assert from "power-assert"
 import {parse} from "markdown-to-ast";
 import StringSource from "../src/StringSource";
+import sentenceSplitter from "sentence-splitter";
 describe("StringSource", function () {
     describe("#toString", function () {
         it("should concat string", function () {
@@ -241,6 +242,37 @@ describe("StringSource", function () {
             assert.equal(result, "alt text");
             assert.throws(function () {
                 source.originalPositionFor();
+            });
+        });
+        it("with sentenceSplitter", function () {
+            var originalText = "`1`st.\n" +
+                "``2`nd.`\n" +
+                "`3`rd Text.";
+            let AST = parse(originalText);
+            // Node -> Plain Text
+            let source = new StringSource(AST);
+            let result = source.toString();
+            // Plain Text -> Sentences
+            let sentences = sentenceSplitter(result).filter(node => node.type === "Sentence");
+            assert.equal(sentences.length, 3);
+            let lastSentence = sentences[sentences.length - 1];
+            // Find "text" in a Sentence
+            let indexOf = lastSentence.value.indexOf("Text");
+            assert.equal(indexOf, 4);
+            // position in a sentence
+            let matchWordPosition = {
+                line: lastSentence.loc.start.line,
+                column: lastSentence.loc.start.column + indexOf
+            };
+            assert.deepEqual(matchWordPosition, {
+                line: 3,
+                column: 4
+            });
+            // position in original text
+            let originalMatchWordPosition = source.originalPositionFor(matchWordPosition);
+            assert.deepEqual(originalMatchWordPosition, {
+                line: 3,
+                column: 6
             });
         });
     })
