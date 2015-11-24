@@ -142,6 +142,19 @@ describe("StringSource", function () {
     });
 
     describe("#originalPositionFor", function () {
+        it("Str + Lint", function () {
+            var originalText = "This is [Example！？](http://example.com/)";
+            let AST = parse(originalText);
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "This is Example！？");
+            var index1 = result.indexOf("Example");
+            assert.equal(index1, 8);
+            assert.equal(source.originalPositionFor(index1), 9);
+            var index2 = result.indexOf("！？");
+            assert.equal(index2, 15);
+            assert.equal(source.originalPositionFor(index2), 16);
+        });
         it("should return original position for index", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);

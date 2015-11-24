@@ -29,10 +29,15 @@ export default class StringSource {
         return this.generatedString;
     }
 
+    /**
+     * Pass index value and return original index value.
+     * @param {number} position - position is a index value.
+     * @returns {number|undefined} original
+     */
     originalPositionFor(position) {
         let hitTokenMaps = this.tokenMaps.filter(tokenMap => {
             let generated = tokenMap.generated;
-            if (generated[0] <= position && position <= generated[1]) {
+            if (generated[0] <= position && position < generated[1]) {
                 return true;
             }
         });
@@ -46,8 +51,12 @@ export default class StringSource {
         // adjustedStart = 1
         // b's index = 3 + 1
         let hitTokenMap = hitTokenMaps[0];
-        let adjustedStart = position - hitTokenMap.generated[0];
-        return hitTokenMap.original[0] + adjustedStart;
+        // <----------->\[<------------->|text]
+        //              ^        ^
+        //   position-generated  intermediate-origin
+        let outAdjust = position - hitTokenMap.generated[0];
+        let inAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
+        return outAdjust + inAdjust + hitTokenMap.original[0];
     }
 
 

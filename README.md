@@ -1,10 +1,13 @@
-# txtast-util-to-string
+# textlint-util-to-string
 
-Convert `Paragraph` to plain text for [textlint](https://github.com/azu/textlint "textlint").
+Convert `Paragraph` Node to plain text with SourceMap.
+
+This library is for [textlint](https://github.com/textlint/textlint "textlint") and [textstat](https://github.com/azu/textstat "textstat").
 
 ## Installation
 
-- [ ] Describe the installation process
+    npm install textlint-util-to-string
+
 
 ## Usage
 
