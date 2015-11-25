@@ -16,9 +16,11 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 Return original index of the `generatedIndex`.
 
-### `source.originalPositionFor({ line, column }): { line, column}`
+### `source.originalPositionFor(generatedPosition): position`
 
-Return original position object(`{ line, column }`).
+`position` is a object that has `line` and `column` properties.
+
+Return original position object of `generatedPosition`
 
 ```js
 import assert from "power-assert"
