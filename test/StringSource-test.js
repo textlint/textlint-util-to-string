@@ -12,8 +12,39 @@ describe("StringSource", function () {
             assert(source + "!!", "str!!");
         });
     });
-
     context("Each Pattern", function () {
+        it("should return relative position of the node", function () {
+            let AST = parse(`1st P
+
+**2nd** P`);
+            let [p1st , p2nd] = AST.children;
+            let source1st = new StringSource(p1st);
+            assert.equal(source1st.toString(), "1st P");
+            assert.equal(source1st.tokenMaps.length, 1);
+            let token1st = source1st.tokenMaps[0];
+            assert.deepEqual(token1st, {
+                generated: [0, 5],
+                intermediate: [0, 5],
+                original: [0, 5],
+                value: "1st P"
+            });
+            let source2nd = new StringSource(p2nd);
+            assert.equal(source2nd.toString(), "2nd P");
+            assert.equal(source2nd.tokenMaps.length, 2);
+            // should return relative position from p2nd
+            assert.deepEqual(source2nd.tokenMaps[0], {
+                generated: [0, 3],
+                intermediate: [2, 5],
+                original: [0, 7],
+                value: "2nd"
+            });
+            assert.deepEqual(source2nd.tokenMaps[1], {
+                generated: [3, 5],
+                intermediate: [7, 9],
+                original: [7, 9],
+                value: " P"
+            });
+        });
         it("Str", function () {
             let AST = parse("**str**");
             let source = new StringSource(AST);

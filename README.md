@@ -10,6 +10,16 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Usage
 
+### `Constructor(node): source`
+
+### `source.originalIndexFor(generatedIndex): number`
+
+Return original index of the `generatedIndex`.
+
+### `source.originalPositionFor({ line, column }): { line, column}`
+
+Return original position object(`{ line, column }`).
+
 ```js
 import assert from "power-assert"
 import {parse} from "markdown-to-ast";
@@ -24,13 +34,35 @@ let index1 = result.indexOf("Example");
 assert.equal(index1, 8);
 // 8 -> 9
 // originalText[9];// "E"
-assert.equal(source.originalPositionFor(index1), 9);
+assert.equal(source.originalIndexFor(index1), 9);
+assert.deepEqual(source.originalPositionFor({
+    line: 1,
+    column:8
+}), {
+    line: 1,
+    column: 9
+);
 let index2 = result.indexOf("！？");
 assert.equal(index2, 15);
 // 15 -> 16
 // originalText[16];// "！"
-assert.equal(source.originalPositionFor(index2), 16);
+assert.equal(source.originalIndexFor(index2), 16);
 ```
+
+## FAQ
+
+### Why return relative position from rootNode?
+
+```js
+let AST = ....
+let rootNode = AST.children[10];
+let source = new StringSource(rootNode);
+source.originalIndexFor(0); // should be 0
+```
+
+To return relative position easy to compute position(We think).
+
+One space has a single absolute position. other should be relative position.
 
 ## Tests
 

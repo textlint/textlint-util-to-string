@@ -94,6 +94,14 @@ export default class StringSource {
         }
     }
 
+    _nodeRangeAsRelative(node) {
+        // relative from root
+        return [
+            node.range[0] - this.rootNode.range[0],
+            node.range[1] - this.rootNode.range[0]
+        ]
+    }
+
     _valueOf(node, parent) {
         if (!node) {
             return;
@@ -113,8 +121,8 @@ export default class StringSource {
         // <p><Str /></p>
         if (this.isParagraphNode(parent) && this.isStringNode(node)) {
             return {
-                original: node.range,
-                intermediate: node.range,
+                original: this._nodeRangeAsRelative(node),
+                intermediate: this._nodeRangeAsRelative(node),
                 value: value
             };
         }
@@ -126,7 +134,8 @@ export default class StringSource {
         let rawValue = container.raw;
         let paddingLeft = rawValue.indexOf(value, 1); // avoid match ! with ![
         let paddingRight = rawValue.length - (paddingLeft + value.length);
-        let originalRange = container.range;
+        // original range should be relative value from rootNode
+        let originalRange = this._nodeRangeAsRelative(container);
         let intermediateRange = [
             originalRange[0] + paddingLeft,
             originalRange[1] - paddingRight
@@ -156,13 +165,12 @@ export default class StringSource {
     }
 
     /**
-     * Returns the text content of a node.  If the node itself
+     * Compute text content of a node.  If the node itself
      * does not expose plain-text fields, `toString` will
      * recursivly try its children.
      *
      * @param {Node} node - Node to transform to a string.
      * @param {Node} [parent] - Parent Node of the `node`.
-     * @return {string} - Textual representation.
      */
     _stringify(node, parent) {
         let value = this._valueOf(node, parent);
