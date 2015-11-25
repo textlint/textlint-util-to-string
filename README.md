@@ -2,6 +2,8 @@
 
 Convert `Paragraph` Node to plain text with SourceMap.
 
+SourceMap mean that could revert `position` in plain text to `position in Node.
+
 This library is for [textlint](https://github.com/textlint/textlint "textlint") and [textstat](https://github.com/azu/textstat "textstat").
 
 ## Installation
