@@ -12,7 +12,9 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Usage
 
-### `Constructor(node): source`
+### `Constructor(rootNode): source`
+
+Return instance of Source.
 
 ### `source.originalIndexFor(generatedIndex): number`
 
@@ -66,7 +68,7 @@ source.originalIndexFor(0); // should be 0
 
 To return relative position easy to compute position(We think).
 
-One space has a single absolute position. other should be relative position.
+One space has a single absolute position, The other should be relative position.
 
 ## Tests
 
