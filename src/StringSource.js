@@ -33,14 +33,31 @@ export default class StringSource {
     }
 
     /**
-     * Pass index value and return original index value.
-     * @param {number} targetIndex - position is a index value.
-     * @returns {number|undefined} original
+     * @deprecated use originalIndexFromIndex instead of
+     * @param targetIndex
      */
     originalIndexFor(targetIndex) {
+        return this.originalIndexFromIndex(targetIndex);
+    }
+
+    /**
+     * @deprecated use originalPositionFromPosition instead of
+     * @param generatedPosition
+     * @returns {Object}
+     */
+    originalPositionFor(generatedPosition) {
+        return this.originalPositionFromPosition(generatedPosition);
+    }
+
+    /**
+     * Pass (generated)index value and return original index value.
+     * @param {number} generatedIndex - position is a index value.
+     * @returns {number|undefined} original
+     */
+    originalIndexFromIndex(generatedIndex) {
         let hitTokenMaps = this.tokenMaps.filter(tokenMap => {
             let generated = tokenMap.generated;
-            if (generated[0] <= targetIndex && targetIndex < generated[1]) {
+            if (generated[0] <= generatedIndex && generatedIndex < generated[1]) {
                 return true;
             }
         });
@@ -57,12 +74,17 @@ export default class StringSource {
         // <----------->\[<------------->|text]
         //              ^        ^
         //   position-generated  intermediate-origin
-        let outAdjust = targetIndex - hitTokenMap.generated[0];
+        let outAdjust = generatedIndex - hitTokenMap.generated[0];
         let inAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
         return outAdjust + inAdjust + hitTokenMap.original[0];
     }
 
-    originalPositionFor(position) {
+    /**
+     * Pass generated position and return original position.
+     * @param {object} position
+     * @returns {object} original position
+     */
+    originalPositionFromPosition(position) {
         if (typeof position.line === "undefined" || typeof position.column === "undefined") {
             throw new Error("position.{line, column} should not undefined: " + JSON.stringify(position));
         }
@@ -71,7 +93,17 @@ export default class StringSource {
             // Not Found
             return;
         }
-        let originalIndex = this.originalIndexFor(generatedIndex);
+        let originalIndex = this.originalIndexFromIndex(generatedIndex);
+        return this.originalSource.indexToPosition(originalIndex);
+    }
+
+    originalIndexFromPosition(generatedPosition) {
+        const originalPosition = this.originalPositionFromPosition(generatedPosition);
+        return this.originalSource.positionToIndex(originalPosition);
+    }
+
+    originalPositionFromIndex(generatedIndex) {
+        let originalIndex = this.originalIndexFromIndex(generatedIndex);
         return this.originalSource.indexToPosition(originalIndex);
     }
 

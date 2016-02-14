@@ -173,7 +173,7 @@ describe("StringSource", function () {
         });
     });
 
-    describe("#originalIndexFor", function () {
+    describe("#originalIndexFromIndex", function () {
         it("Str + Link", function () {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
@@ -182,10 +182,10 @@ describe("StringSource", function () {
             assert.equal(result, "This is Example！？");
             var index1 = result.indexOf("Example");
             assert.equal(index1, 8);
-            assert.equal(source.originalIndexFor(index1), 9);
+            assert.equal(source.originalIndexFromIndex(index1), 9);
             var index2 = result.indexOf("！？");
             assert.equal(index2, 15);
-            assert.equal(source.originalIndexFor(index2), 16);
+            assert.equal(source.originalIndexFromIndex(index2), 16);
         });
         it("should return original position for index", function () {
             var originalText = "![alt](http://example.png) text";
@@ -195,7 +195,7 @@ describe("StringSource", function () {
             assert.equal(result, "alt text");
             var indexOf = result.indexOf("text");
             assert.equal(indexOf, 4);
-            assert.deepEqual(source.originalIndexFor(indexOf), 27);
+            assert.deepEqual(source.originalIndexFromIndex(indexOf), 27);
             assert.equal(originalText.slice(27), "text");
         });
         it("should return null when not found position for index", function () {
@@ -204,7 +204,7 @@ describe("StringSource", function () {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalIndexFor(1000), null);
+            assert.equal(source.originalIndexFromIndex(1000), null);
         });
         it("should return null when -1", function () {
             var originalText = "![alt](http://example.png) text";
@@ -212,24 +212,24 @@ describe("StringSource", function () {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalIndexFor(-1), null);
+            assert.equal(source.originalIndexFromIndex(-1), null);
         });
     });
-    describe("#originalPositionFor", function () {
+    describe("#originalPositionFromPosition", function () {
         it("Str + Link", function () {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "This is Example！？");
-            assert.deepEqual(source.originalPositionFor({
+            assert.deepEqual(source.originalPositionFromPosition({
                 line: 1,
                 column: 8
             }), {
                 line: 1,
                 column: 9
             });
-            assert.deepEqual(source.originalPositionFor({
+            assert.deepEqual(source.originalPositionFromPosition({
                 line: 1,
                 column: 15
             }), {
@@ -246,7 +246,7 @@ describe("StringSource", function () {
             // 4
             var lines = result.split("\n");
             var indexOf = lines[1].indexOf("text");
-            assert.deepEqual(source.originalPositionFor({
+            assert.deepEqual(source.originalPositionFromPosition({
                 line: lines.length,
                 column: indexOf
             }), {
@@ -260,7 +260,7 @@ describe("StringSource", function () {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalPositionFor({
+            assert.equal(source.originalPositionFromPosition({
                 line: -1,
                 column: -1
             }), null);
@@ -272,7 +272,7 @@ describe("StringSource", function () {
             let result = source.toString();
             assert.equal(result, "alt text");
             assert.throws(function () {
-                source.originalPositionFor();
+                source.originalPositionFromPosition();
             });
         });
         it("with sentenceSplitter", function () {
@@ -300,7 +300,7 @@ describe("StringSource", function () {
                 column: 4
             });
             // position in original text
-            let originalMatchWordPosition = source.originalPositionFor(matchWordPosition);
+            let originalMatchWordPosition = source.originalPositionFromPosition(matchWordPosition);
             assert.deepEqual(originalMatchWordPosition, {
                 line: 3,
                 column: 6
