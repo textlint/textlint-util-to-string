@@ -18,10 +18,10 @@ export default class StringSource {
             // original range
             // e.g.) [0, 7] = `**Str**`
             original : [start, end]
-            // trim value from Original = intermediate
+            // intermediate = trim decoration from Original
             // e.g.) [2, 5]
             intermediate: [start, end]
-            // actual value = Str
+            // generaged value = "Str"
             // e.g.) [0, 3]
             generated : [start, end]
         }]
@@ -132,7 +132,9 @@ export default class StringSource {
         // => container is <strong>
         let container = this.isParagraphNode(parent) ? node : parent;
         let rawValue = container.raw;
-        let paddingLeft = rawValue.indexOf(value, 1); // avoid match ! with ![
+        // avoid match ! with ![
+        // TODO: indexOf(value, 1) 1 is unexpected ...
+        let paddingLeft = rawValue.indexOf(value, 1);
         let paddingRight = rawValue.length - (paddingLeft + value.length);
         // original range should be relative value from rootNode
         let originalRange = this._nodeRangeAsRelative(container);
