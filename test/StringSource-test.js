@@ -9,7 +9,7 @@ describe("StringSource", function () {
         it("should concat string", function () {
             let AST = parse("**str**");
             let source = new StringSource(AST);
-            assert(source + "!!", "str!!");
+            assert.equal(source + "!!", "str!!");
         });
     });
     context("Each Pattern", function () {
@@ -306,5 +306,6 @@ describe("StringSource", function () {
                 column: 6
             });
         });
-    })
+    });
+    
 });
