@@ -2,14 +2,14 @@
   "name": "textlint-util-to-string",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/azu/textlint-util-to-string.git"
+    "url": "git+https://github.com/textlint/textlint-util-to-string.git"
   },
   "author": "azu",
   "email": "azuciao@gmail.com",
-  "homepage": "https://github.com/azu/textlint-util-to-string",
+  "homepage": "https://github.com/textlint/textlint-util-to-string",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/azu/textlint-util-to-string/issues"
+    "url": "https://github.com/textlint/textlint-util-to-string/issues"
   },
   "version": "1.2.0",
   "description": "textlint util convert Paragraph Node to text with SourceMap.",
