@@ -50,7 +50,7 @@ export default class StringSource {
     }
 
     /**
-     * Pass (generated)index value and return original index value.
+     * get original index from generated index value
      * @param {number} generatedIndex - position is a index value.
      * @returns {number|undefined} original
      */
@@ -80,7 +80,7 @@ export default class StringSource {
     }
 
     /**
-     * Pass generated position and return original position.
+     * get original position from generated position
      * @param {object} position
      * @returns {object} original position
      */
@@ -97,11 +97,21 @@ export default class StringSource {
         return this.originalSource.indexToPosition(originalIndex);
     }
 
+    /**
+     * get original index from generated position
+     * @param {object} generatedPosition
+     * @returns {number} original index
+     */
     originalIndexFromPosition(generatedPosition) {
         const originalPosition = this.originalPositionFromPosition(generatedPosition);
         return this.originalSource.positionToIndex(originalPosition);
     }
 
+    /**
+     * get original position from generated index
+     * @param {number} generatedIndex
+     * @return {object} original position
+     */
     originalPositionFromIndex(generatedIndex) {
         let originalIndex = this.originalIndexFromIndex(generatedIndex);
         return this.originalSource.indexToPosition(originalIndex);
