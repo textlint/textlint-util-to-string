@@ -12,19 +12,19 @@ export default class StringSource {
         this.originalSource = new StructuredSource(this.rootNode.raw);
         this.generatedSource = new StructuredSource(this.generatedString);
         /*
-        [
-        // e.g.) **Str**
-        {
-            // original range
-            // e.g.) [0, 7] = `**Str**`
-            original : [start, end]
-            // intermediate = trim decoration from Original
-            // e.g.) [2, 5]
-            intermediate: [start, end]
-            // generaged value = "Str"
-            // e.g.) [0, 3]
-            generated : [start, end]
-        }]
+         [
+         // e.g.) **Str**
+         {
+         // original range
+         // e.g.) [0, 7] = `**Str**`
+         original : [start, end]
+         // intermediate = trim decoration from Original
+         // e.g.) [2, 5]
+         intermediate: [start, end]
+         // generaged value = "Str"
+         // e.g.) [0, 3]
+         generated : [start, end]
+         }]
          */
     }
 
@@ -176,7 +176,7 @@ export default class StringSource {
         let rawValue = container.raw;
         // avoid match ! with ![
         // TODO: indexOf(value, 1) 1 is unexpected ...
-        let paddingLeft = rawValue.indexOf(value, 1);
+        let paddingLeft = rawValue.indexOf(value, 1) === -1 ? 0 : rawValue.indexOf(value, 1);
         let paddingRight = rawValue.length - (paddingLeft + value.length);
         // original range should be relative value from rootNode
         let originalRange = this._nodeRangeAsRelative(container);
