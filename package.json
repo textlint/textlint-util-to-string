@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/textlint/textlint-util-to-string/issues"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "textlint util convert Paragraph Node to text with SourceMap.",
   "main": "lib/StringSource.js",
   "files": [
