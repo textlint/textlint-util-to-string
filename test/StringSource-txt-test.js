@@ -1,12 +1,11 @@
 // LICENSE : MIT
 "use strict";
 import assert from "power-assert"
-import {parse} from "markdown-to-ast";
 import StringSource from "../src/StringSource";
-import sentenceSplitter from "sentence-splitter";
-describe("StringSource", function () {
-    describe("#toString", function () {
-        it("should concat string", function () {
+import {split as sentenceSplitter} from "sentence-splitter";
+describe("StringSource", function() {
+    describe("#toString", function() {
+        it("should concat string", function() {
             const AST = {
                 "type": "Document",
                 "raw": "Str",
