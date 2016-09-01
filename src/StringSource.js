@@ -55,10 +55,17 @@ export default class StringSource {
      * @returns {number|undefined} original
      */
     originalIndexFromIndex(generatedIndex) {
-        let hitTokenMaps = this.tokenMaps.filter(tokenMap => {
-            let generated = tokenMap.generated;
-            if (generated[0] <= generatedIndex && generatedIndex < generated[1]) {
-                return true;
+        let hitTokenMaps = this.tokenMaps.filter((tokenMap, index) => {
+            const generated = tokenMap.generated;
+            const nextGenerated = this.tokenMaps[index + 1];
+            if (nextGenerated) {
+                if (generated[0] <= generatedIndex && generatedIndex < nextGenerated[0]) {
+                    return true;
+                }
+            } else {
+                if (generated[0] <= generatedIndex && generatedIndex <= generated[1]) {
+                    return true;
+                }
             }
         });
         if (hitTokenMaps.length === 0) {
