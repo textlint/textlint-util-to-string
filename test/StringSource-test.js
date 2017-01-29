@@ -17,7 +17,7 @@ describe("StringSource", function() {
             let AST = parse(`1st P
 
 **2nd** P`);
-            let [p1st , p2nd] = AST.children;
+            let [p1st, p2nd] = AST.children;
             let source1st = new StringSource(p1st);
             assert.equal(source1st.toString(), "1st P");
             assert.equal(source1st.tokenMaps.length, 1);
@@ -225,6 +225,17 @@ describe("StringSource", function() {
             let result = source.toString();
             assert.equal(result, "alt text");
             assert.equal(source.originalIndexFromIndex(-1), null);
+        });
+        it("test for https://github.com/textlint/textlint-util-to-string/issues/4", function() {
+            // related https://github.com/textlint/textlint-util-to-string/commit/1969f3b82bc490b435e2b2a631cf89a7158d80ed
+            const originalText = "This link contains an [errror](index.html).";
+            const AST = parse(originalText);
+            const source = new StringSource(AST);
+            const originalPosition = source.originalPositionFromIndex(22);
+            assert.deepEqual(originalPosition, {
+                line: 1,
+                column: 23
+            });
         });
     });
     describe("#originalPositionFromPosition", function() {
