@@ -151,7 +151,7 @@ describe("StringSource", function() {
                 value: " text"
             });
         });
-        it("confuse pattern", function() {
+        it("confusing pattern", function() {
             let AST = parse("![!](http://example.com)");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -187,7 +187,7 @@ describe("StringSource", function() {
             assert.equal(index2, 15);
             assert.equal(source.originalIndexFromIndex(index2), 16);
         });
-        it("should return original position for index", function() {
+        it("should return the original index of an index in a generated sentence", function() {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -198,7 +198,7 @@ describe("StringSource", function() {
             assert.deepEqual(source.originalIndexFromIndex(indexOf), 27);
             assert.equal(originalText.slice(27), "text");
         });
-        it("should return original position for index - end match", function() {
+        it("should return the original index (the end of a sentence)", function() {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -210,7 +210,7 @@ describe("StringSource", function() {
             assert.equal(source.originalIndexFromIndex(indexOf + ("text".length - 1)), 30);
             assert.equal(originalText[source.originalIndexFromIndex(indexOf + ("text".length - 1))], "t");
         });
-        it("should return null when not found position for index", function() {
+        it("should return null when the specified index is larger than the length of a generated sentence", function() {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -249,7 +249,7 @@ describe("StringSource", function() {
                 column: 16
             });
         });
-        it("should return original position for index", function() {
+        it("should return the original position from a position in a generated sentence", function() {
             var originalText = "First\n![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -266,7 +266,7 @@ describe("StringSource", function() {
                 column: 27
             });
         });
-        it("should return null when not found position for index", function() {
+        it("should return null when the specified position is invalid", function() {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -277,7 +277,7 @@ describe("StringSource", function() {
                 column: -1
             }), null);
         });
-        it("should throw error when position is not object", function() {
+        it("should throw error when the specified position is not an object", function() {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
