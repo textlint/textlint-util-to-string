@@ -61,7 +61,7 @@ assert.equal(index1, 8);
 assert.equal(source.originalIndexFromIndex(index1), 9);
 assert.deepEqual(source.originalPositionFromPosition({
     line: 1,
-    column:8
+    column: 8
 }), {
     line: 1,
     column: 9
