@@ -2,8 +2,7 @@
 "use strict";
 import assert from "power-assert"
 import StringSource from "../src/StringSource";
-import {split as sentenceSplitter} from "sentence-splitter";
-describe("StringSource", function() {
+describe("StringSource AST", function() {
     describe("#toString", function() {
         it("should concat string", function() {
             const AST = {
