@@ -245,13 +245,16 @@ describe("StringSource", function() {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "This is Example！？");
+            // The second whitespace
             assert.deepEqual(source.originalPositionFromPosition({
                 line: 1,
                 column: 8
             }), {
                 line: 1,
-                column: 9
+                column: 8
             });
+            // Example
+            //       ^
             assert.deepEqual(source.originalPositionFromPosition({
                 line: 1,
                 column: 15
@@ -266,15 +269,16 @@ describe("StringSource", function() {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "First\nalt text");
-            // 4
             var lines = result.split("\n");
             var indexOf = lines[1].indexOf("text");
+            // text
+            // ^
             assert.deepEqual(source.originalPositionFromPosition({
-                line: lines.length,
-                column: indexOf
+                line: 2,
+                column: indexOf + 1
             }), {
                 line: 2,
-                column: 27
+                column: 28
             });
         });
         it("should return null when the specified position is invalid", function() {
@@ -310,23 +314,25 @@ describe("StringSource", function() {
             let sentences = sentenceSplitter(result).filter(node => node.type === "Sentence");
             assert.equal(sentences.length, 3);
             let lastSentence = sentences[sentences.length - 1];
-            // Find "text" in a Sentence
+            // Find "text" in the third generated sentence
             let indexOf = lastSentence.value.indexOf("Text");
             assert.equal(indexOf, 4);
             // position in a sentence
+            // NOTE: textlint's column starts with 1
+            // while sentence-splitter's column starts with 0
             let matchWordPosition = {
                 line: lastSentence.loc.start.line,
-                column: lastSentence.loc.start.column + indexOf
+                column: lastSentence.loc.start.column + indexOf + 1
             };
             assert.deepEqual(matchWordPosition, {
                 line: 3,
-                column: 4
+                column: 5
             });
             // position in original text
             let originalMatchWordPosition = source.originalPositionFromPosition(matchWordPosition);
             assert.deepEqual(originalMatchWordPosition, {
                 line: 3,
-                column: 6
+                column: 7
             });
         });
     });
