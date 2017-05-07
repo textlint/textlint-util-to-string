@@ -1,5 +1,7 @@
 # textlint-util-to-string
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/textlint/textlint-util-to-string.svg)](https://greenkeeper.io/)
+
 Convert `Paragraph` Node to plain text with SourceMap.
 
 SourceMap mean that could revert `position` in plain text to `position` in Node.
