@@ -2,6 +2,7 @@
 "use strict";
 import ObjectAssign from "object-assign";
 import StructuredSource from "structured-source";
+
 export default class StringSource {
     constructor(node) {
         this.rootNode = node;
@@ -21,7 +22,7 @@ export default class StringSource {
          // intermediate = trim decoration from Original
          // e.g.) [2, 5]
          intermediate: [start, end]
-         // generaged value = "Str"
+         // generated value = "Str"
          // e.g.) [0, 3]
          generated : [start, end]
          }]
@@ -43,24 +44,27 @@ export default class StringSource {
     /**
      * @deprecated use originalPositionFromPosition instead of
      * @param generatedPosition
+     * @param {boolean}  isEnd - is the position end of the node?
+
      * @returns {Object}
      */
-    originalPositionFor(generatedPosition) {
-        return this.originalPositionFromPosition(generatedPosition);
+    originalPositionFor(generatedPosition, isEnd) {
+        return this.originalPositionFromPosition(generatedPosition, isEnd);
     }
 
     /**
      * get original index from generated index value
      * @param {number} generatedIndex - position is a index value.
+     * @param {boolean}  isEnd - is the position end of the node?
      * @returns {number|undefined} original
      */
-    originalIndexFromIndex(generatedIndex) {
+    originalIndexFromIndex(generatedIndex, isEnd = false) {
         let hitTokenMaps = this.tokenMaps.filter((tokenMap, index) => {
             const generated = tokenMap.generated;
             const nextTokenMap = this.tokenMaps[index + 1];
             const nextGenerated = nextTokenMap ? nextTokenMap.generated : null;
             if (nextGenerated) {
-                if (generated[0] <= generatedIndex && generatedIndex < nextGenerated[0]) {
+                if (generated[0] <= generatedIndex && generatedIndex <= nextGenerated[0]) {
                     return true;
                 }
             } else {
@@ -72,57 +76,70 @@ export default class StringSource {
         if (hitTokenMaps.length === 0) {
             return;
         }
-        // a bcd
-        // b = index 1
-        // original `a` bcd
-        // originalRange [3, 7]
-        // adjustedStart = 1
-        // b's index = 3 + 1
-        let hitTokenMap = hitTokenMaps[0];
-        // <----------->\[<------------->|text]
+
+        /**
+         * **Str**ABC
+         *     |
+         *     |
+         *   generatedIndex
+         *
+         * If isEnd is true, generatedIndex is end of **Str** node.
+         * If isEnd is false, generatedIndex is index of ABC node.
+         */
+
+        const hitTokenMap = isEnd ? hitTokenMaps[0] : hitTokenMaps[hitTokenMaps.length - 1];
+        // <----------->[<------------->|text]
         //              ^        ^
         //   position-generated  intermediate-origin
-        let outAdjust = generatedIndex - hitTokenMap.generated[0];
-        let inAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
-        return outAdjust + inAdjust + hitTokenMap.original[0];
+
+        // <-------------->[<------------->|text]
+        //       |         |
+        //  outer adjust   _
+        //            inner adjust = 1
+        const outerAdjust = generatedIndex - hitTokenMap.generated[0];
+        const innerAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
+        return outerAdjust + innerAdjust + hitTokenMap.original[0];
     }
 
     /**
      * get original position from generated position
      * @param {object} position
+     * @param {boolean}  isEnd - is the position end of the node?
      * @returns {object} original position
      */
-    originalPositionFromPosition(position) {
+    originalPositionFromPosition(position, isEnd = false) {
         if (typeof position.line === "undefined" || typeof position.column === "undefined") {
             throw new Error("position.{line, column} should not undefined: " + JSON.stringify(position));
         }
-        var generatedIndex = this.generatedSource.positionToIndex(position);
+        const generatedIndex = this.generatedSource.positionToIndex(position);
         if (isNaN(generatedIndex)) {
             // Not Found
             return;
         }
-        let originalIndex = this.originalIndexFromIndex(generatedIndex);
-        return this.originalSource.indexToPosition(originalIndex);
+        const originalIndex = this.originalIndexFromIndex(generatedIndex, isEnd);
+        return this.originalSource.indexToPosition(originalIndex, isEnd);
     }
 
     /**
      * get original index from generated position
      * @param {object} generatedPosition
+     * @param {boolean}  isEnd - is the position end of the node?
      * @returns {number} original index
      */
-    originalIndexFromPosition(generatedPosition) {
+    originalIndexFromPosition(generatedPosition, isEnd = false) {
         const originalPosition = this.originalPositionFromPosition(generatedPosition);
-        return this.originalSource.positionToIndex(originalPosition);
+        return this.originalSource.positionToIndex(originalPosition, isEnd);
     }
 
     /**
      * get original position from generated index
      * @param {number} generatedIndex
+     * @param {boolean} isEnd - is the position end of the node?
      * @return {object} original position
      */
-    originalPositionFromIndex(generatedIndex) {
+    originalPositionFromIndex(generatedIndex, isEnd = false) {
         let originalIndex = this.originalIndexFromIndex(generatedIndex);
-        return this.originalSource.indexToPosition(originalIndex);
+        return this.originalSource.indexToPosition(originalIndex, isEnd);
     }
 
 

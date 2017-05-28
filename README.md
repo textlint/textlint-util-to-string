@@ -14,8 +14,7 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 The concepts `position` and `index` are the same as those explained in [Constellation/structured-source](https://github.com/Constellation/structured-source).
 
-Please pay extra attention to the `column` property of `position` as it is 0-based index
-and defferent from that of `textlint` which is 1-based index.
+**Note**: the `column` property of `position` as it is **0-based** index.
 
 ## Usage
 

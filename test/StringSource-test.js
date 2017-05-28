@@ -1,9 +1,10 @@
 // LICENSE : MIT
 "use strict";
-import assert from "power-assert"
-import {parse} from "markdown-to-ast";
+import assert from "assert"
+import { parse } from "markdown-to-ast";
 import StringSource from "../src/StringSource";
-import {split as sentenceSplitter} from "sentence-splitter";
+import { split as sentenceSplitter } from "sentence-splitter";
+
 describe("StringSource", function() {
     describe("#toString", function() {
         it("should concat string", function() {
@@ -174,12 +175,20 @@ describe("StringSource", function() {
     });
 
     describe("#originalIndexFromIndex", function() {
+        it("should correct **match** at end", function() {
+            const AST = parse("**match** text");
+            const source = new StringSource(AST);
+            assert.equal(source.originalIndexFromIndex(0), 2);
+            // isEnd
+            assert.equal(source.originalIndexFromIndex(5, true), 7);
+        });
         it("Str + Link", function() {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "This is Example！？");
+            assert.ok(originalText.slice(9, 16) === "Example");
             var index1 = result.indexOf("Example");
             assert.equal(index1, 8);
             assert.equal(source.originalIndexFromIndex(index1), 9);
