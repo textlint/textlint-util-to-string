@@ -73,6 +73,13 @@ assert.equal(index2, 15);
 assert.equal(source.originalIndexFromIndex(index2), 16);
 ```
 
+## Examples
+
+- [azu/textlint-rule-first-sentence-length: textlint rule that limit maximum length of First sentence of the section.](https://github.com/azu/textlint-rule-first-sentence-length)
+- [azu/textlint-rule-en-max-word-count: textlint rule that specify the maximum word count of a sentence.](https://github.com/azu/textlint-rule-en-max-word-count)
+- [nodaguti/textlint-rule-spellchecker: textlint rule to check spellings with native spellchecker](https://github.com/nodaguti/textlint-rule-spellchecker)
+
+
 ## FAQ
 
 ### Why return relative position from rootNode?
