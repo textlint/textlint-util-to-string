@@ -151,12 +151,22 @@ export default class StringSource {
         return node.type === "Str";
     }
 
+    /**
+     *
+     * @param node
+     * @returns {string|undefined}
+     * @private
+     */
     _getValue(node) {
         if (node.value) {
             return node.value;
         } else if (node.alt) {
             return node.alt;
         } else if (node.title) {
+            // See https://github.com/azu/textlint-rule-sentence-length/issues/6
+            if (node.type === "Link") {
+                return;
+            }
             return node.title;
         }
     }
@@ -178,11 +188,11 @@ export default class StringSource {
         // [padding][value][padding]
         // =>
         // [value][value][value]
-        let value = this._getValue(node);
+        const value = this._getValue(node);
         if (!value) {
             return;
         }
-        if (parent == null) {
+        if (parent === null || parent === undefined) {
             return;
         }
         // <p><Str /></p>
