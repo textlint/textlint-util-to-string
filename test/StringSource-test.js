@@ -95,6 +95,27 @@ describe("StringSource", function() {
                 value: "link"
             });
         });
+
+        it("Link's title should be ignored", function() {
+            let AST = parse('_[link](http://example "title")');
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "_link");
+            let tokenStr = source.tokenMaps[0];
+            assert.deepEqual(tokenStr, {
+                generated: [0, 1],
+                intermediate: [0, 1],
+                original: [0, 1],
+                value: "_"
+            });
+            let tokenLink = source.tokenMaps[1];
+            assert.deepEqual(tokenLink, {
+                generated: [1, 5],
+                intermediate: [2, 6],
+                original: [1, 31],
+                value: "link"
+            });
+        });
         it("Str + `Code` + Str", function() {
             let AST = parse("text`code`text");
             let source = new StringSource(AST);
@@ -149,6 +170,25 @@ describe("StringSource", function() {
                 generated: [3, 8],
                 intermediate: [26, 31],
                 original: [26, 31],
+                value: " text"
+            });
+        });
+        it("Image's title should be ignored", function() {
+            let AST = parse('![alt](http://example.png "title") text');
+            let source = new StringSource(AST);
+            let result = source.toString();
+            assert.equal(result, "alt text");
+            assert.equal(source.tokenMaps.length, 2);
+            assert.deepEqual(source.tokenMaps[0], {
+                generated: [0, 3],
+                intermediate: [2, 5],
+                original: [0, 34],
+                value: "alt"
+            });
+            assert.deepEqual(source.tokenMaps[1], {
+                generated: [3, 8],
+                intermediate: [34, 39],
+                original: [34, 39],
                 value: " text"
             });
         });
