@@ -22,26 +22,26 @@ The concepts `position` and `index` are the same as those explained in [Constell
 
 Return instance of Source.
 
-## `originalIndexFromIndex(generatedIndex): number`
+## `originalIndexFromIndex(generatedIndex): number | undefined`
 
 Get original index from generated index value
 
-## `originalPositionFromPosition(position): Position`
+## `originalPositionFromPosition(position): Position | undefined`
 
 Get original position from generated position
 
-## `originalIndexFromPosition(generatedPosition): number`
+## `originalIndexFromPosition(generatedPosition): number | undefined`
 
 Get original index from generated position
 
-## `originalPositionFromIndex(generatedIndex): Position`
+## `originalPositionFromIndex(generatedIndex): Position | undefined`
 
 Get original position from generated index
 
 ```js
-import assert from "power-assert"
+import assert from "assert"
 import {parse} from "markdown-to-ast";
-import StringSource from "textlint-util-to-string";
+import {StringSource} from "textlint-util-to-string";
 
 let originalText = "This is [Example！？](http://example.com/)";
 let AST = parse(originalText);
@@ -85,7 +85,7 @@ assert.equal(source.originalIndexFromIndex(index2), 16);
 ### Why return relative position from rootNode?
 
 ```js
-let AST = ....
+let AST = {...}
 let rootNode = AST.children[10];
 let source = new StringSource(rootNode);
 source.originalIndexFor(0); // should be 0
