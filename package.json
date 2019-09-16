@@ -17,7 +17,7 @@
     "src"
   ],
   "main": "lib/index.js",
-  "types": "lib/textlint-util-to-string.d.ts",
+  "types": "lib/index.d.ts",
   "directories": {
     "test": "test"
   },
