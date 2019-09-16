@@ -192,6 +192,59 @@ describe("StringSource", function() {
                 generatedValue: " text"
             });
         });
+        it("inline html tag", function() {
+            const AST = parse("It is <p>TEST</p>");
+            const source = new StringSource(AST);
+            const result = source.toString();
+            assert.strictEqual(result, "It is TEST");
+            const indexOfGenerated = result.indexOf("TEST");
+            const indexOfOriginal = source.originalIndexFromIndex(indexOfGenerated);
+            assert.strictEqual(indexOfOriginal, 9);
+            assert.strictEqual(source.tokenMaps.length, 2);
+            assert.deepStrictEqual(source.tokenMaps[0], {
+                "generated": [
+                    0,
+                    6,
+                ],
+                "generatedValue": "It is ",
+                "intermediate": [
+                    0,
+                    6,
+                ],
+                "original": [
+                    0,
+                    6,
+                ]
+            });
+            assert.deepStrictEqual(source.tokenMaps[1], {
+                "generated": [
+                    6,
+                    10,
+                ],
+                "generatedValue": "TEST",
+                "intermediate": [
+                    9,
+                    13,
+                ],
+                "original": [
+                    9,
+                    13,
+                ]
+            })
+        });
+        it("complex html tag", function () {
+            const AST = parse(`<a href="http://example.com" title="example"><img src="http://example.com" />TEST1</a> **BOLD** <b>TEST2</b>`);
+            const source = new StringSource(AST);
+            const result = source.toString();
+            assert.strictEqual(result, "TEST1 BOLD TEST2");
+            const index1Generated = result.indexOf("TEST1");
+            const index1Original = source.originalIndexFromIndex(index1Generated);
+            assert.strictEqual(index1Original, 77);
+            const index2Generated = result.indexOf("TEST2");
+            const index2Original = source.originalIndexFromIndex(index2Generated);
+            assert.strictEqual(index2Original, 99);
+
+        });
         it("confusing pattern", function() {
             let AST = parse("![!](http://example.com)");
             let source = new StringSource(AST);

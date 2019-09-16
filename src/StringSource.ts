@@ -2,6 +2,16 @@
 "use strict";
 import { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
 import StructuredSource, { SourcePosition } from "structured-source";
+
+const unified = require('unified');
+const parse = require('rehype-parse');
+
+const html2hast = (html: string): TxtParentNode => {
+    return unified()
+        .use(parse, {fragment: true})
+        .parse(html)
+};
+
 /* StringSourceIR example
  Example: **Str**
  {
@@ -284,14 +294,16 @@ export default class StringSource {
      * @param {Node} [parent] - Parent Node of the `node`.
      */
     private _stringify(node: TxtNode | TxtParentNode, parent?: TxtParentNode): void | StringSourceIR {
-        let value = this._valueOf(node, parent);
+        const isHTML = node.type === "Html";
+        const currentNode = isHTML ? html2hast(node.value) : node;
+        const value = this._valueOf(currentNode, parent);
         if (value) {
             return value;
         }
         if (!isParentNode(node)) {
             return;
         }
-        node.children.forEach((childNode: TxtNode) => {
+        currentNode.children.forEach((childNode: TxtNode) => {
             if (!isParentNode(node)) {
                 return;
             }

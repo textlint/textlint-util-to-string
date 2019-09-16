@@ -30,7 +30,9 @@
   "dependencies": {
     "@textlint/ast-node-types": "^4.2.4",
     "@types/structured-source": "^3.0.0",
-    "structured-source": "^3.0.2"
+    "rehype-parse": "^6.0.1",
+    "structured-source": "^3.0.2",
+    "unified": "^8.4.0"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
