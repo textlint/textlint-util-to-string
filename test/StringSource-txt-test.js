@@ -1,62 +1,53 @@
 // LICENSE : MIT
 "use strict";
-import assert from "assert"
+import assert from "assert";
 import StringSource from "../src/StringSource";
 describe("StringSource AST", function() {
     describe("#toString", function() {
         it("should concat string", function() {
             const AST = {
-                "type": "Document",
-                "raw": "Str",
-                "range": [
-                    0,
-                    3
-                ],
-                "loc": {
-                    "start": {
-                        "line": 1,
-                        "column": 0
+                type: "Document",
+                raw: "Str",
+                range: [0, 3],
+                loc: {
+                    start: {
+                        line: 1,
+                        column: 0
                     },
-                    "end": {
-                        "line": 1,
-                        "column": 3
+                    end: {
+                        line: 1,
+                        column: 3
                     }
                 },
-                "children": [
+                children: [
                     {
-                        "type": "Paragraph",
-                        "raw": "Str",
-                        "range": [
-                            0,
-                            3
-                        ],
-                        "loc": {
-                            "start": {
-                                "line": 1,
-                                "column": 0
+                        type: "Paragraph",
+                        raw: "Str",
+                        range: [0, 3],
+                        loc: {
+                            start: {
+                                line: 1,
+                                column: 0
                             },
-                            "end": {
-                                "line": 1,
-                                "column": 3
+                            end: {
+                                line: 1,
+                                column: 3
                             }
                         },
-                        "children": [
+                        children: [
                             {
-                                "type": "Str",
-                                "raw": "Str",
-                                "value": "Str",
-                                "range": [
-                                    0,
-                                    3
-                                ],
-                                "loc": {
-                                    "start": {
-                                        "line": 1,
-                                        "column": 0
+                                type: "Str",
+                                raw: "Str",
+                                value: "Str",
+                                range: [0, 3],
+                                loc: {
+                                    start: {
+                                        line: 1,
+                                        column: 0
                                     },
-                                    "end": {
-                                        "line": 1,
-                                        "column": 3
+                                    end: {
+                                        line: 1,
+                                        column: 3
                                     }
                                 }
                             }
