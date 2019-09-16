@@ -1,10 +1,37 @@
 // LICENSE : MIT
 "use strict";
-import ObjectAssign from "object-assign";
-import StructuredSource from "structured-source";
+import { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
+import StructuredSource, { SourcePosition } from "structured-source";
+/* StringSourceIR example
+ Example: **Str**
+ {
+ // original range
+ // [0, 7] = `**Str**`
+ original : [start, end]
+ // intermediate = trim decoration from Original
+ // [2, 5]
+ intermediate: [start, end]
+ // (generated) value
+ generatedValue: "Str"
+ // [0, 3]
+ generated : [start, end]
+ }
+ */
 
+type StringSourceIR = {
+    original: readonly [number, number],
+    intermediate: readonly [number, number],
+    generatedValue: string;
+    generated?: [number, number];
+}
 export default class StringSource {
-    constructor(node) {
+    private rootNode: TxtParentNode;
+    private generatedString: string;
+    private originalSource: StructuredSource;
+    private generatedSource: StructuredSource;
+    private tokenMaps: StringSourceIR[];
+
+    constructor(node: TxtParentNode) {
         this.rootNode = node;
         this.tokenMaps = [];
         this.generatedString = "";
@@ -12,21 +39,6 @@ export default class StringSource {
         this._stringify(this.rootNode);
         this.originalSource = new StructuredSource(this.rootNode.raw);
         this.generatedSource = new StructuredSource(this.generatedString);
-        /*
-         [
-         // e.g.) **Str**
-         {
-         // original range
-         // e.g.) [0, 7] = `**Str**`
-         original : [start, end]
-         // intermediate = trim decoration from Original
-         // e.g.) [2, 5]
-         intermediate: [start, end]
-         // generated value = "Str"
-         // e.g.) [0, 3]
-         generated : [start, end]
-         }]
-         */
     }
 
     toString() {
@@ -37,7 +49,7 @@ export default class StringSource {
      * @deprecated use originalIndexFromIndex instead of
      * @param targetIndex
      */
-    originalIndexFor(targetIndex) {
+    originalIndexFor(targetIndex: number): number | undefined {
         return this.originalIndexFromIndex(targetIndex);
     }
 
@@ -48,7 +60,7 @@ export default class StringSource {
 
      * @returns {Object}
      */
-    originalPositionFor(generatedPosition, isEnd) {
+    originalPositionFor(generatedPosition: SourcePosition, isEnd = false): SourcePosition | undefined {
         return this.originalPositionFromPosition(generatedPosition, isEnd);
     }
 
@@ -58,11 +70,14 @@ export default class StringSource {
      * @param {boolean}  isEnd - is the position end of the node?
      * @returns {number|undefined} original
      */
-    originalIndexFromIndex(generatedIndex, isEnd = false) {
-        let hitTokenMaps = this.tokenMaps.filter((tokenMap, index) => {
+    originalIndexFromIndex(generatedIndex: number, isEnd = false) {
+        const hitTokenMaps = this.tokenMaps.filter((tokenMap, index) => {
             const generated = tokenMap.generated;
             const nextTokenMap = this.tokenMaps[index + 1];
             const nextGenerated = nextTokenMap ? nextTokenMap.generated : null;
+            if (!generated) {
+                return false;
+            }
             if (nextGenerated) {
                 if (generated[0] <= generatedIndex && generatedIndex <= nextGenerated[0]) {
                     return true;
@@ -72,6 +87,7 @@ export default class StringSource {
                     return true;
                 }
             }
+            return false;
         });
         if (hitTokenMaps.length === 0) {
             return;
@@ -96,6 +112,11 @@ export default class StringSource {
         //       |         |
         //  outer adjust   _
         //            inner adjust = 1
+
+        if (!hitTokenMap.generated) {
+            console.warn("hitTokenMap.generated is missing", hitTokenMap);
+            return;
+        }
         const outerAdjust = generatedIndex - hitTokenMap.generated[0];
         const innerAdjust = hitTokenMap.intermediate[0] - hitTokenMap.original[0];
         return outerAdjust + innerAdjust + hitTokenMap.original[0];
@@ -107,7 +128,7 @@ export default class StringSource {
      * @param {boolean}  isEnd - is the position end of the node?
      * @returns {object} original position
      */
-    originalPositionFromPosition(position, isEnd = false) {
+    originalPositionFromPosition(position: SourcePosition, isEnd = false): SourcePosition | undefined {
         if (typeof position.line === "undefined" || typeof position.column === "undefined") {
             throw new Error("position.{line, column} should not undefined: " + JSON.stringify(position));
         }
@@ -117,7 +138,10 @@ export default class StringSource {
             return;
         }
         const originalIndex = this.originalIndexFromIndex(generatedIndex, isEnd);
-        return this.originalSource.indexToPosition(originalIndex, isEnd);
+        if (originalIndex === undefined) {
+            return;
+        }
+        return this.originalSource.indexToPosition(originalIndex);
     }
 
     /**
@@ -126,9 +150,12 @@ export default class StringSource {
      * @param {boolean}  isEnd - is the position end of the node?
      * @returns {number} original index
      */
-    originalIndexFromPosition(generatedPosition, isEnd = false) {
-        const originalPosition = this.originalPositionFromPosition(generatedPosition);
-        return this.originalSource.positionToIndex(originalPosition, isEnd);
+    originalIndexFromPosition(generatedPosition: SourcePosition, isEnd = false): number | undefined {
+        const originalPosition = this.originalPositionFromPosition(generatedPosition, isEnd);
+        if (originalPosition === undefined) {
+            return;
+        }
+        return this.originalSource.positionToIndex(originalPosition);
     }
 
     /**
@@ -137,17 +164,20 @@ export default class StringSource {
      * @param {boolean} isEnd - is the position end of the node?
      * @return {object} original position
      */
-    originalPositionFromIndex(generatedIndex, isEnd = false) {
-        let originalIndex = this.originalIndexFromIndex(generatedIndex);
-        return this.originalSource.indexToPosition(originalIndex, isEnd);
+    originalPositionFromIndex(generatedIndex: number, isEnd = false): SourcePosition | undefined {
+        const originalIndex = this.originalIndexFromIndex(generatedIndex, isEnd);
+        if (originalIndex === undefined) {
+            return;
+        }
+        return this.originalSource.indexToPosition(originalIndex);
     }
 
 
-    isParagraphNode(node) {
+    isParagraphNode(node: TxtNode): boolean {
         return node.type === "Paragraph";
     }
 
-    isStringNode(node) {
+    isStringNode(node: TxtNode): boolean {
         return node.type === "Str";
     }
 
@@ -157,7 +187,7 @@ export default class StringSource {
      * @returns {string|undefined}
      * @private
      */
-    _getValue(node) {
+    private _getValue(node: TxtNode): string | undefined {
         if (node.value) {
             return node.value;
         } else if (node.alt) {
@@ -168,10 +198,12 @@ export default class StringSource {
                 return;
             }
             return node.title;
+        } else {
+            return;
         }
     }
 
-    _nodeRangeAsRelative(node) {
+    private _nodeRangeAsRelative(node: TxtNode): [number, number] {
         // relative from root
         return [
             node.range[0] - this.rootNode.range[0],
@@ -179,7 +211,7 @@ export default class StringSource {
         ]
     }
 
-    _valueOf(node, parent) {
+    private _valueOf(node: TxtNode, parent?: TxtParentNode): StringSourceIR | undefined {
         if (!node) {
             return;
         }
@@ -200,7 +232,7 @@ export default class StringSource {
             return {
                 original: this._nodeRangeAsRelative(node),
                 intermediate: this._nodeRangeAsRelative(node),
-                value: value
+                generatedValue: value
             };
         }
         // <p><code>code</code></p>
@@ -218,20 +250,20 @@ export default class StringSource {
         let intermediateRange = [
             originalRange[0] + paddingLeft,
             originalRange[1] - paddingRight
-        ];
+        ] as const;
         return {
             original: originalRange,
             intermediate: intermediateRange,
-            value: value
+            generatedValue: value
         };
 
     }
 
-    _addTokenMap(tokenMap) {
+    private _addTokenMap(tokenMap: StringSourceIR) {
         if (tokenMap == null) {
             return;
         }
-        let addedTokenMap = ObjectAssign({}, tokenMap);
+        let addedTokenMap = Object.assign({}, tokenMap);
         if (this.tokenMaps.length === 0) {
             let textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
             addedTokenMap["generated"] = [0, textLength];
@@ -239,31 +271,38 @@ export default class StringSource {
             let textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
             addedTokenMap["generated"] = [this.generatedString.length, this.generatedString.length + textLength];
         }
-        this.generatedString += tokenMap.value;
+        this.generatedString += tokenMap.generatedValue;
         this.tokenMaps.push(addedTokenMap);
     }
 
     /**
      * Compute text content of a node.  If the node itself
      * does not expose plain-text fields, `toString` will
-     * recursivly try its children.
+     * recursively mapping
      *
      * @param {Node} node - Node to transform to a string.
      * @param {Node} [parent] - Parent Node of the `node`.
      */
-    _stringify(node, parent) {
+    private _stringify(node: TxtNode | TxtParentNode, parent?: TxtParentNode): void | StringSourceIR {
         let value = this._valueOf(node, parent);
         if (value) {
             return value;
         }
-        if (!node.children) {
+        if (!isParentNode(node)) {
             return;
         }
-        node.children.forEach((childNode) => {
-            let tokenMap = this._stringify(childNode, node);
+        node.children.forEach((childNode: TxtNode) => {
+            if (!isParentNode(node)) {
+                return;
+            }
+            const tokenMap = this._stringify(childNode, node);
             if (tokenMap) {
                 this._addTokenMap(tokenMap);
             }
         });
     }
 }
+
+const isParentNode = (node: TxtNode | TxtParentNode): node is  TxtParentNode => {
+    return "children" in node;
+};

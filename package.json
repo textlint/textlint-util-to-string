@@ -1,44 +1,48 @@
 {
   "name": "textlint-util-to-string",
+  "version": "2.1.1",
+  "description": "textlint util convert Paragraph Node to text with SourceMap.",
+  "homepage": "https://github.com/textlint/textlint-util-to-string",
+  "bugs": {
+    "url": "https://github.com/textlint/textlint-util-to-string/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/textlint/textlint-util-to-string.git"
   },
-  "author": "azu",
-  "email": "azuciao@gmail.com",
-  "homepage": "https://github.com/textlint/textlint-util-to-string",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/textlint/textlint-util-to-string/issues"
-  },
-  "version": "2.1.1",
-  "description": "textlint util convert Paragraph Node to text with SourceMap.",
-  "main": "lib/index.js",
+  "author": "azu",
   "files": [
     "lib",
     "src"
   ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "build": "NODE_ENV=production babel src --out-dir lib --source-maps",
-    "watch": "babel src --out-dir lib --watch --source-maps",
+    "build": "cross-env NODE_ENV=production tsc -p .",
     "prepublish": "npm run --if-present build",
-    "test": "mocha test"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.2.0",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-preset-power-assert": "^1.0.0",
-    "babel-register": "^6.24.1",
-    "markdown-to-ast": "^4.0.0",
-    "mocha": "^3.0.2",
-    "power-assert": "^1.4.2",
-    "sentence-splitter": "^2.0.0"
+    "test": "mocha \"test/**/*.{js,ts}\"",
+    "watch": "tsc -p . --watch"
   },
   "dependencies": {
-    "object-assign": "^4.0.1",
+    "@textlint/ast-node-types": "^4.2.4",
+    "@types/structured-source": "^3.0.0",
     "structured-source": "^3.0.2"
-  }
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.5",
+    "cross-env": "^5.2.1",
+    "markdown-to-ast": "^4.0.0",
+    "mocha": "^6.2.0",
+    "power-assert": "^1.4.2",
+    "sentence-splitter": "^2.0.0",
+    "ts-node": "^8.4.1",
+    "ts-node-test-register": "^8.0.1",
+    "typescript": "^3.6.3"
+  },
+  "email": "azuciao@gmail.com"
 }

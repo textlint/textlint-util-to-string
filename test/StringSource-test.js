@@ -27,7 +27,7 @@ describe("StringSource", function() {
                 generated: [0, 5],
                 intermediate: [0, 5],
                 original: [0, 5],
-                value: "1st P"
+                generatedValue: "1st P"
             });
             let source2nd = new StringSource(p2nd);
             assert.equal(source2nd.toString(), "2nd P");
@@ -37,13 +37,13 @@ describe("StringSource", function() {
                 generated: [0, 3],
                 intermediate: [2, 5],
                 original: [0, 7],
-                value: "2nd"
+                generatedValue: "2nd"
             });
             assert.deepEqual(source2nd.tokenMaps[1], {
                 generated: [3, 5],
                 intermediate: [7, 9],
                 original: [7, 9],
-                value: " P"
+                generatedValue: " P"
             });
         });
         it("Str", function() {
@@ -57,7 +57,7 @@ describe("StringSource", function() {
                 generated: [0, 3],
                 intermediate: [2, 5],
                 original: [0, 7],
-                value: "str"
+                generatedValue: "str"
             });
         });
         it("Str that contain break line", function() {
@@ -71,7 +71,7 @@ describe("StringSource", function() {
                 generated: [0, 4],
                 intermediate: [2, 6],
                 original: [0, 8],
-                value: "st\nr"
+                generatedValue: "st\nr"
             });
         });
         it("Link", function() {
@@ -85,14 +85,14 @@ describe("StringSource", function() {
                 generated: [0, 1],
                 intermediate: [0, 1],
                 original: [0, 1],
-                value: "_"
+                generatedValue: "_"
             });
             let tokenLink = source.tokenMaps[1];
             assert.deepEqual(tokenLink, {
                 generated: [1, 5],
                 intermediate: [2, 6],
                 original: [1, 23],
-                value: "link"
+                generatedValue: "link"
             });
         });
 
@@ -106,14 +106,14 @@ describe("StringSource", function() {
                 generated: [0, 1],
                 intermediate: [0, 1],
                 original: [0, 1],
-                value: "_"
+                generatedValue: "_"
             });
             let tokenLink = source.tokenMaps[1];
             assert.deepEqual(tokenLink, {
                 generated: [1, 5],
                 intermediate: [2, 6],
                 original: [1, 31],
-                value: "link"
+                generatedValue: "link"
             });
         });
         it("Str + `Code` + Str", function() {
@@ -126,19 +126,19 @@ describe("StringSource", function() {
                 generated: [0, 4],
                 intermediate: [0, 4],
                 original: [0, 4],
-                value: "text"
+                generatedValue: "text"
             });
             assert.deepEqual(source.tokenMaps[1], {
                 generated: [4, 8],
                 intermediate: [5, 9],
                 original: [4, 10],
-                value: "code"
+                generatedValue: "code"
             });
             assert.deepEqual(source.tokenMaps[2], {
                 generated: [8, 12],
                 intermediate: [10, 14],
                 original: [10, 14],
-                value: "text"
+                generatedValue: "text"
             });
         });
         it("Header", function() {
@@ -151,7 +151,7 @@ describe("StringSource", function() {
                 generated: [0, 6],
                 intermediate: [2, 8],
                 original: [0, 8],
-                value: "Header"
+                generatedValue: "Header"
             });
         });
         it("Image + Str", function() {
@@ -164,13 +164,13 @@ describe("StringSource", function() {
                 generated: [0, 3],
                 intermediate: [2, 5],
                 original: [0, 26],
-                value: "alt"
+                generatedValue: "alt"
             });
             assert.deepEqual(source.tokenMaps[1], {
                 generated: [3, 8],
                 intermediate: [26, 31],
                 original: [26, 31],
-                value: " text"
+                generatedValue: " text"
             });
         });
         it("Image's title should be ignored", function() {
@@ -183,13 +183,13 @@ describe("StringSource", function() {
                 generated: [0, 3],
                 intermediate: [2, 5],
                 original: [0, 34],
-                value: "alt"
+                generatedValue: "alt"
             });
             assert.deepEqual(source.tokenMaps[1], {
                 generated: [3, 8],
                 intermediate: [34, 39],
                 original: [34, 39],
-                value: " text"
+                generatedValue: " text"
             });
         });
         it("confusing pattern", function() {
@@ -202,7 +202,7 @@ describe("StringSource", function() {
                 generated: [0, 1],
                 intermediate: [2, 3],
                 original: [0, 24],
-                value: "!"
+                generatedValue: "!"
             });
         });
         it("Empty", function() {
