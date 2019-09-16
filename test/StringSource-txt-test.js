@@ -1,6 +1,6 @@
 // LICENSE : MIT
 "use strict";
-import assert from "power-assert"
+import assert from "assert"
 import StringSource from "../src/StringSource";
 describe("StringSource AST", function() {
     describe("#toString", function() {
