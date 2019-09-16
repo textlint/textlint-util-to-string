@@ -3,13 +3,13 @@
 import { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
 import StructuredSource, { SourcePosition } from "structured-source";
 
-const unified = require('unified');
-const parse = require('rehype-parse');
+const unified = require("unified");
+const parse = require("rehype-parse");
 
 const html2hast = (html: string): TxtParentNode => {
     return unified()
-        .use(parse, {fragment: true})
-        .parse(html)
+        .use(parse, { fragment: true })
+        .parse(html);
 };
 
 /* StringSourceIR example
@@ -29,11 +29,11 @@ const html2hast = (html: string): TxtParentNode => {
  */
 
 type StringSourceIR = {
-    original: readonly [number, number],
-    intermediate: readonly [number, number],
+    original: readonly [number, number];
+    intermediate: readonly [number, number];
     generatedValue: string;
     generated?: [number, number];
-}
+};
 export default class StringSource {
     private rootNode: TxtParentNode;
     private generatedString: string;
@@ -182,7 +182,6 @@ export default class StringSource {
         return this.originalSource.indexToPosition(originalIndex);
     }
 
-
     isParagraphNode(node: TxtNode): boolean {
         return node.type === "Paragraph";
     }
@@ -215,17 +214,13 @@ export default class StringSource {
 
     private _nodeRangeAsRelative(node: TxtNode): [number, number] {
         // relative from root
-        return [
-            node.range[0] - this.rootNode.range[0],
-            node.range[1] - this.rootNode.range[0]
-        ]
+        return [node.range[0] - this.rootNode.range[0], node.range[1] - this.rootNode.range[0]];
     }
 
     private _valueOf(node: TxtNode, parent?: TxtParentNode): StringSourceIR | undefined {
         if (!node) {
             return;
         }
-
 
         // [padding][value][padding]
         // =>
@@ -257,16 +252,12 @@ export default class StringSource {
         let paddingRight = rawValue.length - (paddingLeft + value.length);
         // original range should be relative value from rootNode
         let originalRange = this._nodeRangeAsRelative(container);
-        let intermediateRange = [
-            originalRange[0] + paddingLeft,
-            originalRange[1] - paddingRight
-        ] as const;
+        let intermediateRange = [originalRange[0] + paddingLeft, originalRange[1] - paddingRight] as const;
         return {
             original: originalRange,
             intermediate: intermediateRange,
             generatedValue: value
         };
-
     }
 
     private _addTokenMap(tokenMap: StringSourceIR) {
@@ -315,6 +306,6 @@ export default class StringSource {
     }
 }
 
-const isParentNode = (node: TxtNode | TxtParentNode): node is  TxtParentNode => {
+const isParentNode = (node: TxtNode | TxtParentNode): node is TxtParentNode => {
     return "children" in node;
 };

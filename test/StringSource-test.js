@@ -1,6 +1,6 @@
 // LICENSE : MIT
 "use strict";
-import assert from "assert"
+import assert from "assert";
 import { parse } from "markdown-to-ast";
 import StringSource from "../src/StringSource";
 import { split as sentenceSplitter } from "sentence-splitter";
@@ -202,38 +202,22 @@ describe("StringSource", function() {
             assert.strictEqual(indexOfOriginal, 9);
             assert.strictEqual(source.tokenMaps.length, 2);
             assert.deepStrictEqual(source.tokenMaps[0], {
-                "generated": [
-                    0,
-                    6,
-                ],
-                "generatedValue": "It is ",
-                "intermediate": [
-                    0,
-                    6,
-                ],
-                "original": [
-                    0,
-                    6,
-                ]
+                generated: [0, 6],
+                generatedValue: "It is ",
+                intermediate: [0, 6],
+                original: [0, 6]
             });
             assert.deepStrictEqual(source.tokenMaps[1], {
-                "generated": [
-                    6,
-                    10,
-                ],
-                "generatedValue": "TEST",
-                "intermediate": [
-                    9,
-                    13,
-                ],
-                "original": [
-                    9,
-                    13,
-                ]
-            })
+                generated: [6, 10],
+                generatedValue: "TEST",
+                intermediate: [9, 13],
+                original: [9, 13]
+            });
         });
-        it("complex html tag", function () {
-            const AST = parse(`<a href="http://example.com" title="example"><img src="http://example.com" />TEST1</a> **BOLD** <b>TEST2</b>`);
+        it("complex html tag", function() {
+            const AST = parse(
+                `<a href="http://example.com" title="example"><img src="http://example.com" />TEST1</a> **BOLD** <b>TEST2</b>`
+            );
             const source = new StringSource(AST);
             const result = source.toString();
             assert.strictEqual(result, "TEST1 BOLD TEST2");
@@ -243,7 +227,6 @@ describe("StringSource", function() {
             const index2Generated = result.indexOf("TEST2");
             const index2Original = source.originalIndexFromIndex(index2Generated);
             assert.strictEqual(index2Original, 99);
-
         });
         it("confusing pattern", function() {
             let AST = parse("![!](http://example.com)");
@@ -347,20 +330,26 @@ describe("StringSource", function() {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "This is Example！？");
-            assert.deepEqual(source.originalPositionFromPosition({
-                line: 1,
-                column: 8
-            }), {
-                line: 1,
-                column: 9
-            });
-            assert.deepEqual(source.originalPositionFromPosition({
-                line: 1,
-                column: 15
-            }), {
-                line: 1,
-                column: 16
-            });
+            assert.deepEqual(
+                source.originalPositionFromPosition({
+                    line: 1,
+                    column: 8
+                }),
+                {
+                    line: 1,
+                    column: 9
+                }
+            );
+            assert.deepEqual(
+                source.originalPositionFromPosition({
+                    line: 1,
+                    column: 15
+                }),
+                {
+                    line: 1,
+                    column: 16
+                }
+            );
         });
         it("should return the original position from a position in a generated sentence", function() {
             var originalText = "First\n![alt](http://example.png) text";
@@ -371,13 +360,16 @@ describe("StringSource", function() {
             // 4
             var lines = result.split("\n");
             var indexOf = lines[1].indexOf("text");
-            assert.deepEqual(source.originalPositionFromPosition({
-                line: lines.length,
-                column: indexOf
-            }), {
-                line: 2,
-                column: 27
-            });
+            assert.deepEqual(
+                source.originalPositionFromPosition({
+                    line: lines.length,
+                    column: indexOf
+                }),
+                {
+                    line: 2,
+                    column: 27
+                }
+            );
         });
         it("should return null when the specified position is invalid", function() {
             var originalText = "![alt](http://example.png) text";
@@ -385,10 +377,13 @@ describe("StringSource", function() {
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.equal(source.originalPositionFromPosition({
-                line: -1,
-                column: -1
-            }), null);
+            assert.equal(
+                source.originalPositionFromPosition({
+                    line: -1,
+                    column: -1
+                }),
+                null
+            );
         });
         it("should throw error when the specified position is not an object", function() {
             var originalText = "![alt](http://example.png) text";
@@ -401,9 +396,7 @@ describe("StringSource", function() {
             });
         });
         it("with sentenceSplitter", function() {
-            var originalText = "`1`st.\n" +
-                "``2`nd.`\n" +
-                "`3`rd Text.";
+            var originalText = "`1`st.\n" + "``2`nd.`\n" + "`3`rd Text.";
             let AST = parse(originalText);
             // Node -> Plain Text
             let source = new StringSource(AST);
@@ -432,5 +425,4 @@ describe("StringSource", function() {
             });
         });
     });
-
 });

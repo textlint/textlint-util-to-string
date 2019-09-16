@@ -25,7 +25,8 @@
     "build": "cross-env NODE_ENV=production tsc -p .",
     "prepublish": "npm run --if-present build",
     "test": "mocha \"test/**/*.{js,ts}\"",
-    "watch": "tsc -p . --watch"
+    "watch": "tsc -p . --watch",
+    "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\""
   },
   "dependencies": {
     "@textlint/ast-node-types": "^4.2.4",
@@ -38,12 +39,31 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.5",
     "cross-env": "^5.2.1",
+    "husky": "^3.0.5",
+    "lint-staged": "^9.2.5",
     "markdown-to-ast": "^4.0.0",
     "mocha": "^6.2.0",
+    "prettier": "^1.18.2",
     "sentence-splitter": "^2.0.0",
     "ts-node": "^8.4.1",
     "ts-node-test-register": "^8.0.1",
     "typescript": "^3.6.3"
   },
-  "email": "azuciao@gmail.com"
+  "email": "azuciao@gmail.com",
+  "prettier": {
+    "singleQuote": false,
+    "printWidth": 120,
+    "tabWidth": 4
+  },
+  "husky": {
+    "hooks": {
+      "precommit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
