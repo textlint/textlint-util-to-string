@@ -14,7 +14,8 @@
   "author": "azu",
   "files": [
     "lib",
-    "src"
+    "src",
+    "dist"
   ],
   "source": "src/index.ts",
   "main": "dist/index.js",
