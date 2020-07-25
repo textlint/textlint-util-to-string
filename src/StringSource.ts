@@ -1,4 +1,4 @@
-import { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
+import type { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
 import StructuredSource, { SourcePosition } from "structured-source";
 import type { Node as UnistNode } from "unist"
 import unified from "unified";
