@@ -1,14 +1,17 @@
-// LICENSE : MIT
-"use strict";
-import { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
+import type { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
 import StructuredSource, { SourcePosition } from "structured-source";
+import type { Node as UnistNode } from "unist"
+import unified from "unified";
+// @ts-ignore
+import parse from "rehype-parse";
 
-const unified = require("unified");
-const parse = require("rehype-parse");
+const isTxtNode = (node: unknown): node is TxtNode => {
+    return typeof node === "object" && node !== null && "range" in node;
+}
 
-const html2hast = (html: string): TxtParentNode => {
+const html2hast = (html: string) => {
     return unified()
-        .use(parse, { fragment: true })
+        .use(parse, {fragment: true})
         .parse(html);
 };
 
@@ -186,7 +189,7 @@ export default class StringSource {
         return node.type === "Paragraph";
     }
 
-    isStringNode(node: TxtNode): boolean {
+    isStringNode(node: TxtNode | UnistNode): boolean {
         return node.type === "Str";
     }
 
@@ -196,7 +199,7 @@ export default class StringSource {
      * @returns {string|undefined}
      * @private
      */
-    private _getValue(node: TxtNode): string | undefined {
+    private _getValue(node: TxtNode | UnistNode): string | undefined {
         if (node.value) {
             return node.value;
         } else if (node.alt) {
@@ -212,12 +215,19 @@ export default class StringSource {
         }
     }
 
-    private _nodeRangeAsRelative(node: TxtNode): [number, number] {
-        // relative from root
-        return [node.range[0] - this.rootNode.range[0], node.range[1] - this.rootNode.range[0]];
+    private _nodeRangeAsRelative(node: TxtNode | UnistNode): [number, number] {
+        if (isTxtNode(node)) {
+            // relative from root
+            return [node.range[0] - this.rootNode.range[0], node.range[1] - this.rootNode.range[0]];
+        } else {
+            return [
+                (node.position?.start?.offset ?? 0) - this.rootNode.range[0],
+                (node.position?.end?.offset ?? 0) - this.rootNode.range[0]
+            ]
+        }
     }
 
-    private _valueOf(node: TxtNode, parent?: TxtParentNode): StringSourceIR | undefined {
+    private _valueOf(node: TxtNode | UnistNode, parent?: TxtParentNode): StringSourceIR | undefined {
         if (!node) {
             return;
         }
@@ -244,15 +254,18 @@ export default class StringSource {
         // => container is <p>
         // <p><strong><Str /></strong></p>
         // => container is <strong>
-        let container = this.isParagraphNode(parent) ? node : parent;
-        let rawValue = container.raw;
+        const container = this.isParagraphNode(parent) ? node : parent;
+        const rawValue = container.raw as string | undefined;
+        if (rawValue === undefined) {
+            return
+        }
         // avoid match ! with ![
         // TODO: indexOf(value, 1) 1 is unexpected ...
-        let paddingLeft = rawValue.indexOf(value, 1) === -1 ? 0 : rawValue.indexOf(value, 1);
-        let paddingRight = rawValue.length - (paddingLeft + value.length);
+        const paddingLeft = rawValue.indexOf(value, 1) === -1 ? 0 : rawValue.indexOf(value, 1);
+        const paddingRight = rawValue.length - (paddingLeft + value.length);
         // original range should be relative value from rootNode
-        let originalRange = this._nodeRangeAsRelative(container);
-        let intermediateRange = [originalRange[0] + paddingLeft, originalRange[1] - paddingRight] as const;
+        const originalRange = this._nodeRangeAsRelative(container);
+        const intermediateRange = [originalRange[0] + paddingLeft, originalRange[1] - paddingRight] as const;
         return {
             original: originalRange,
             intermediate: intermediateRange,

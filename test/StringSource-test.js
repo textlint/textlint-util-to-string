@@ -406,7 +406,7 @@ describe("StringSource", function() {
             assert.equal(sentences.length, 3);
             let lastSentence = sentences[sentences.length - 1];
             // Find "text" in a Sentence
-            let indexOf = lastSentence.value.indexOf("Text");
+            let indexOf = lastSentence.raw.indexOf("Text");
             assert.equal(indexOf, 4);
             // position in a sentence
             let matchWordPosition = {

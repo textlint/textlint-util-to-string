@@ -1,4 +1,4 @@
-# textlint-util-to-string
+# textlint-util-to-string [![Actions Status: test](https://github.com/textlint/textlint-util-to-string/workflows/test/badge.svg)](https://github.com/textlint/textlint-util-to-string/actions?query=workflow%3A"test")
 
 Convert `Paragraph` Node to plain text with SourceMap.
 
