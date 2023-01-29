@@ -1,18 +1,16 @@
 import type { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
-import StructuredSource, { SourcePosition } from "structured-source";
-import type { Node as UnistNode } from "unist"
+import { StructuredSource, SourcePosition } from "structured-source";
+import type { Node as UnistNode } from "unist";
 import unified from "unified";
-// @ts-ignore
+// @ts-expect-error no type definition
 import parse from "rehype-parse";
 
 const isTxtNode = (node: unknown): node is TxtNode => {
     return typeof node === "object" && node !== null && "range" in node;
-}
+};
 
 const html2hast = (html: string) => {
-    return unified()
-        .use(parse, {fragment: true})
-        .parse(html);
+    return unified().use(parse, { fragment: true }).parse(html);
 };
 
 /* StringSourceIR example
@@ -35,7 +33,7 @@ type StringSourceIR = {
     original: readonly [number, number];
     intermediate: readonly [number, number];
     generatedValue: string;
-    generated?: [number, number];
+    generated?: readonly [number, number];
 };
 export default class StringSource {
     private rootNode: TxtParentNode;
@@ -223,7 +221,7 @@ export default class StringSource {
             return [
                 (node.position?.start?.offset ?? 0) - this.rootNode.range[0],
                 (node.position?.end?.offset ?? 0) - this.rootNode.range[0]
-            ]
+            ];
         }
     }
 
@@ -257,7 +255,7 @@ export default class StringSource {
         const container = this.isParagraphNode(parent) ? node : parent;
         const rawValue = container.raw as string | undefined;
         if (rawValue === undefined) {
-            return
+            return;
         }
         // avoid match ! with ![
         // TODO: indexOf(value, 1) 1 is unexpected ...

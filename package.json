@@ -1,7 +1,7 @@
 {
   "name": "textlint-util-to-string",
   "version": "3.1.1",
-  "description": "textlint util convert Paragraph Node to text with SourceMap.",
+  "description": "textlint utility that convert Paragraph Node to text with SourceMap.",
   "homepage": "https://github.com/textlint/textlint-util-to-string",
   "bugs": {
     "url": "https://github.com/textlint/textlint-util-to-string/issues"
@@ -30,45 +30,39 @@
     "prepublish": "npm run --if-present build",
     "test": "mocha \"test/**/*.{js,ts}\"",
     "watch": "tsc -p . --watch",
-    "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\"",
+    "prepare": "git config --local core.hooksPath .githooks"
   },
   "dependencies": {
-    "@textlint/ast-node-types": "^4.2.4",
-    "@types/structured-source": "^3.0.0",
+    "@textlint/ast-node-types": "^13.0.5",
     "rehype-parse": "^6.0.1",
-    "structured-source": "^3.0.2",
+    "structured-source": "^4.0.0",
     "unified": "^8.4.0"
   },
   "devDependencies": {
-    "@types/mocha": "^8.0.0",
-    "@types/node": "^14.0.25",
-    "cross-env": "^7.0.2",
-    "husky": "^4.2.5",
-    "lint-staged": "^10.2.11",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.18",
+    "cross-env": "^7.0.3",
+    "lint-staged": "^13.1.0",
     "markdown-to-ast": "^6.0.3",
-    "microbundle": "^0.12.0-next.9",
-    "mocha": "^8.0.1",
-    "prettier": "^2.0.5",
-    "sentence-splitter": "^3.2.0",
-    "ts-node": "^8.10.2",
-    "ts-node-test-register": "^8.0.1",
-    "typescript": "^3.9.7"
+    "microbundle": "^0.15.1",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.3",
+    "sentence-splitter": "^3.2.2",
+    "ts-node": "^10.9.1",
+    "ts-node-test-register": "^10.0.0",
+    "typescript": "^4.9.4"
   },
   "email": "azuciao@gmail.com",
   "prettier": {
     "singleQuote": false,
     "printWidth": 120,
-    "tabWidth": 4
-  },
-  "husky": {
-    "hooks": {
-      "precommit": "lint-staged"
-    }
+    "tabWidth": 4,
+    "trailingComma": "none"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   }
 }
