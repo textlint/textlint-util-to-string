@@ -43,10 +43,10 @@ import assert from "assert"
 import {parse} from "markdown-to-ast";
 import {StringSource} from "textlint-util-to-string";
 
-let originalText = "This is [Example！？](http://example.com/)";
-let AST = parse(originalText);
-let source = new StringSource(AST);
-let result = source.toString();
+const originalText = "This is [Example！？](http://example.com/)";
+const AST = parse(originalText);
+const source = new StringSource(AST);
+const result = source.toString();
 
 // StringSource#toString returns a plain text
 assert.equal(result, "This is Example！？");
@@ -64,7 +64,7 @@ assert.deepEqual(source.originalPositionFromPosition({
 }), {
     line: 1,
     column: 9
-);
+});
 
 // Another example with "！", which is located at 15 in the plain text
 // and at 16 in the original text
@@ -85,9 +85,9 @@ assert.equal(source.originalIndexFromIndex(index2), 16);
 ### Why return relative position from rootNode?
 
 ```js
-let AST = {...}
-let rootNode = AST.children[10];
-let source = new StringSource(rootNode);
+const AST = {...}
+const rootNode = AST.children[10];
+const source = new StringSource(rootNode);
 source.originalIndexFor(0); // should be 0
 ```
 
