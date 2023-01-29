@@ -5,16 +5,16 @@ import { parse } from "markdown-to-ast";
 import StringSource from "../src/StringSource";
 import { split as sentenceSplitter } from "sentence-splitter";
 
-describe("StringSource", function() {
-    describe("#toString", function() {
-        it("should concat string", function() {
+describe("StringSource", function () {
+    describe("#toString", function () {
+        it("should concat string", function () {
             let AST = parse("**str**");
             let source = new StringSource(AST);
             assert.equal(source + "!!", "str!!");
         });
     });
-    context("Each Pattern", function() {
-        it("should return relative position of the node", function() {
+    context("Each Pattern", function () {
+        it("should return relative position of the node", function () {
             let AST = parse(`1st P
 
 **2nd** P`);
@@ -46,7 +46,7 @@ describe("StringSource", function() {
                 generatedValue: " P"
             });
         });
-        it("Str", function() {
+        it("Str", function () {
             let AST = parse("**str**");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -60,7 +60,7 @@ describe("StringSource", function() {
                 generatedValue: "str"
             });
         });
-        it("Str that contain break line", function() {
+        it("Str that contain break line", function () {
             let AST = parse("**st\nr**");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -74,7 +74,7 @@ describe("StringSource", function() {
                 generatedValue: "st\nr"
             });
         });
-        it("Link", function() {
+        it("Link", function () {
             let AST = parse("_[link](http://example)");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -96,7 +96,7 @@ describe("StringSource", function() {
             });
         });
 
-        it("Link's title should be ignored", function() {
+        it("Link's title should be ignored", function () {
             let AST = parse('_[link](http://example "title")');
             let source = new StringSource(AST);
             let result = source.toString();
@@ -116,7 +116,7 @@ describe("StringSource", function() {
                 generatedValue: "link"
             });
         });
-        it("Str + `Code` + Str", function() {
+        it("Str + `Code` + Str", function () {
             let AST = parse("text`code`text");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -141,7 +141,7 @@ describe("StringSource", function() {
                 generatedValue: "text"
             });
         });
-        it("Header", function() {
+        it("Header", function () {
             let AST = parse("# Header");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -154,7 +154,7 @@ describe("StringSource", function() {
                 generatedValue: "Header"
             });
         });
-        it("Image + Str", function() {
+        it("Image + Str", function () {
             let AST = parse("![alt](http://example.png) text");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -173,7 +173,7 @@ describe("StringSource", function() {
                 generatedValue: " text"
             });
         });
-        it("Image's title should be ignored", function() {
+        it("Image's title should be ignored", function () {
             let AST = parse('![alt](http://example.png "title") text');
             let source = new StringSource(AST);
             let result = source.toString();
@@ -192,7 +192,7 @@ describe("StringSource", function() {
                 generatedValue: " text"
             });
         });
-        it("inline html tag", function() {
+        it("inline html tag", function () {
             const AST = parse("It is <p>TEST</p>");
             const source = new StringSource(AST);
             const result = source.toString();
@@ -214,7 +214,7 @@ describe("StringSource", function() {
                 original: [9, 13]
             });
         });
-        it("complex html tag", function() {
+        it("complex html tag", function () {
             const AST = parse(
                 `<a href="http://example.com" title="example"><img src="http://example.com" />TEST1</a> **BOLD** <b>TEST2</b>`
             );
@@ -228,7 +228,7 @@ describe("StringSource", function() {
             const index2Original = source.originalIndexFromIndex(index2Generated);
             assert.strictEqual(index2Original, 99);
         });
-        it("confusing pattern", function() {
+        it("confusing pattern", function () {
             let AST = parse("![!](http://example.com)");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -241,7 +241,7 @@ describe("StringSource", function() {
                 generatedValue: "!"
             });
         });
-        it("Empty", function() {
+        it("Empty", function () {
             let AST = parse("");
             let source = new StringSource(AST);
             let result = source.toString();
@@ -250,15 +250,15 @@ describe("StringSource", function() {
         });
     });
 
-    describe("#originalIndexFromIndex", function() {
-        it("should correct **match** at end", function() {
+    describe("#originalIndexFromIndex", function () {
+        it("should correct **match** at end", function () {
             const AST = parse("**match** text");
             const source = new StringSource(AST);
             assert.equal(source.originalIndexFromIndex(0), 2);
             // isEnd
             assert.equal(source.originalIndexFromIndex(5, true), 7);
         });
-        it("Str + Link", function() {
+        it("Str + Link", function () {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -272,7 +272,7 @@ describe("StringSource", function() {
             assert.equal(index2, 15);
             assert.equal(source.originalIndexFromIndex(index2), 16);
         });
-        it("should return the original index of an index in a generated sentence", function() {
+        it("should return the original index of an index in a generated sentence", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -283,7 +283,7 @@ describe("StringSource", function() {
             assert.deepEqual(source.originalIndexFromIndex(indexOf), 27);
             assert.equal(originalText.slice(27), "text");
         });
-        it("should return the original index (the end of a sentence)", function() {
+        it("should return the original index (the end of a sentence)", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -295,7 +295,7 @@ describe("StringSource", function() {
             assert.equal(source.originalIndexFromIndex(indexOf + ("text".length - 1)), 30);
             assert.equal(originalText[source.originalIndexFromIndex(indexOf + ("text".length - 1))], "t");
         });
-        it("should return null when the specified index is larger than the length of a generated sentence", function() {
+        it("should return null when the specified index is larger than the length of a generated sentence", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -303,7 +303,7 @@ describe("StringSource", function() {
             assert.equal(result, "alt text");
             assert.equal(source.originalIndexFromIndex(1000), null);
         });
-        it("should return null when -1", function() {
+        it("should return null when -1", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -311,7 +311,7 @@ describe("StringSource", function() {
             assert.equal(result, "alt text");
             assert.equal(source.originalIndexFromIndex(-1), null);
         });
-        it("test for https://github.com/textlint/textlint-util-to-string/issues/4", function() {
+        it("test for https://github.com/textlint/textlint-util-to-string/issues/4", function () {
             // related https://github.com/textlint/textlint-util-to-string/commit/1969f3b82bc490b435e2b2a631cf89a7158d80ed
             const originalText = "This link contains an [errror](index.html).";
             const AST = parse(originalText);
@@ -323,8 +323,8 @@ describe("StringSource", function() {
             });
         });
     });
-    describe("#originalPositionFromPosition", function() {
-        it("Str + Link", function() {
+    describe("#originalPositionFromPosition", function () {
+        it("Str + Link", function () {
             var originalText = "This is [Example！？](http://example.com/)";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -351,7 +351,7 @@ describe("StringSource", function() {
                 }
             );
         });
-        it("should return the original position from a position in a generated sentence", function() {
+        it("should return the original position from a position in a generated sentence", function () {
             var originalText = "First\n![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -371,7 +371,7 @@ describe("StringSource", function() {
                 }
             );
         });
-        it("should return null when the specified position is invalid", function() {
+        it("should return null when the specified position is invalid", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
@@ -385,24 +385,24 @@ describe("StringSource", function() {
                 null
             );
         });
-        it("should throw error when the specified position is not an object", function() {
+        it("should throw error when the specified position is not an object", function () {
             var originalText = "![alt](http://example.png) text";
             let AST = parse(originalText);
             let source = new StringSource(AST);
             let result = source.toString();
             assert.equal(result, "alt text");
-            assert.throws(function() {
+            assert.throws(function () {
                 source.originalPositionFromPosition();
             });
         });
-        it("with sentenceSplitter", function() {
+        it("with sentenceSplitter", function () {
             var originalText = "`1`st.\n" + "``2`nd.`\n" + "`3`rd Text.";
             let AST = parse(originalText);
             // Node -> Plain Text
             let source = new StringSource(AST);
             let result = source.toString();
             // Plain Text -> Sentences
-            let sentences = sentenceSplitter(result).filter(node => node.type === "Sentence");
+            let sentences = sentenceSplitter(result).filter((node) => node.type === "Sentence");
             assert.equal(sentences.length, 3);
             let lastSentence = sentences[sentences.length - 1];
             // Find "text" in a Sentence
