@@ -53,12 +53,12 @@ assert.equal(result, "This is Example！？");
 
 // "Example" is located at the index 8 in the plain text
 //  ^
-let index1 = result.indexOf("Example");
-assert.equal(index1, 8);
+const index1 = result.indexOf("Example");
+assert.strictEqual(index1, 8);
 
 // The same "E" is located at the index 9 in the original text
-assert.equal(source.originalIndexFromIndex(index1), 9);
-assert.deepEqual(source.originalPositionFromPosition({
+assert.strictEqual(source.originalIndexFromIndex(index1), 9);
+assert.deepStrictEqual(source.originalPositionFromPosition({
     line: 1,
     column: 8
 }), {
@@ -68,9 +68,9 @@ assert.deepEqual(source.originalPositionFromPosition({
 
 // Another example with "！", which is located at 15 in the plain text
 // and at 16 in the original text
-let index2 = result.indexOf("！？");
-assert.equal(index2, 15);
-assert.equal(source.originalIndexFromIndex(index2), 16);
+const index2 = result.indexOf("！？");
+assert.strictEqual(index2, 15);
+assert.strictEqual(source.originalIndexFromIndex(index2), 16);
 ```
 
 ## Examples
