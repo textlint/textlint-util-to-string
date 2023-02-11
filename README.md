@@ -12,7 +12,7 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Terminology
 
-The concepts `position` and `index` are the same as those explained in [textlint/structured-source](https://github.com/textlint/structured-source).
+The concepts `position` and `index` are the same as those explained in [TxtAST Interface · textlint](https://textlint.github.io/docs/txtnode.html) and [textlint/structured-source](https://github.com/textlint/structured-source).
 
 - `position` is a `{ line, column }` object.
   - The `column` property of `position` is **0-based**.
