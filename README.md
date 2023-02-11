@@ -57,7 +57,7 @@ const source = new StringSource(paragraphNode, {
         }
     }
 });
-assert.strictEqual(source.toString(), "This is ____.");
+console.log(source.toString()); // => "This is a ____."
 ```
 
 - `maskValue(character: string)`: mask the `value` of the node with the given `character`.
