@@ -12,9 +12,13 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Terminology
 
-The concepts `position` and `index` are the same as those explained in [Constellation/structured-source](https://github.com/Constellation/structured-source).
+The concepts `position` and `index` are the same as those explained in [textlint/structured-source](https://github.com/textlint/structured-source).
 
-**Note**: the `column` property of `position` as it is **0-based** index.
+- `position` is a `{ line, column }` object.
+  - The `column` property of `position` is **0-based**.
+  - The `line` property of `position` is **1-based**.
+- `index` is an offset number.
+  - The `index` property is **0-based**.
 
 ## API
 
