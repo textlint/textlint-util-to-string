@@ -4,13 +4,19 @@ import type { Node as UnistNode } from "unist";
 import unified from "unified";
 // @ts-expect-error no type definition
 import parse from "rehype-parse";
+import { emptyValue, handleReplacerCommand, maskValue, StringSourceReplacerCommand } from "./replacer";
 
 const isTxtNode = (node: unknown): node is TxtNode => {
     return typeof node === "object" && node !== null && "range" in node;
 };
 
+const htmlProcessor = unified().use(parse, { fragment: true });
 const html2hast = (html: string) => {
-    return unified().use(parse, { fragment: true }).parse(html);
+    return htmlProcessor.parse(html);
+};
+
+const isParentNode = (node: TxtNode | TxtParentNode): node is TxtParentNode => {
+    return "children" in node;
 };
 
 /* StringSourceIR example
@@ -35,6 +41,18 @@ type StringSourceIR = {
     generatedValue: string;
     generated?: readonly [number, number];
 };
+
+export type StringSourceOptions = {
+    replacer?: ({
+        node,
+        parent
+    }: {
+        node: TxtNode | UnistNode;
+        parent?: TxtParentNode;
+        maskValue: typeof maskValue;
+        emptyValue: typeof emptyValue;
+    }) => StringSourceReplacerCommand | undefined;
+};
 export default class StringSource {
     private rootNode: TxtParentNode;
     private generatedString: string;
@@ -42,12 +60,12 @@ export default class StringSource {
     private generatedSource: StructuredSource;
     private tokenMaps: StringSourceIR[];
 
-    constructor(node: TxtParentNode) {
+    constructor(node: TxtParentNode, options: StringSourceOptions = {}) {
         this.rootNode = node;
         this.tokenMaps = [];
         this.generatedString = "";
         // pre calculate
-        this._stringify(this.rootNode);
+        this._stringify({ node: this.rootNode, options });
         this.originalSource = new StructuredSource(this.rootNode.raw);
         this.generatedSource = new StructuredSource(this.generatedString);
     }
@@ -225,15 +243,24 @@ export default class StringSource {
         }
     }
 
-    private _valueOf(node: TxtNode | UnistNode, parent?: TxtParentNode): StringSourceIR | undefined {
+    private _valueOf({
+        node,
+        parent,
+        options
+    }: {
+        node: TxtNode | UnistNode;
+        parent?: TxtParentNode;
+        options: StringSourceOptions;
+    }): StringSourceIR | undefined {
         if (!node) {
             return;
         }
-
+        const replaceCommand = options?.replacer?.({ node, parent, maskValue, emptyValue });
+        const newNode = replaceCommand ? handleReplacerCommand(replaceCommand, node) : node;
         // [padding][value][padding]
         // =>
         // [value][value][value]
-        const value = this._getValue(node);
+        const value = this._getValue(newNode);
         if (!value) {
             return;
         }
@@ -241,10 +268,10 @@ export default class StringSource {
             return;
         }
         // <p><Str /></p>
-        if (this.isParagraphNode(parent) && this.isStringNode(node)) {
+        if (this.isParagraphNode(parent) && this.isStringNode(newNode)) {
             return {
-                original: this._nodeRangeAsRelative(node),
-                intermediate: this._nodeRangeAsRelative(node),
+                original: this._nodeRangeAsRelative(newNode),
+                intermediate: this._nodeRangeAsRelative(newNode),
                 generatedValue: value
             };
         }
@@ -252,7 +279,7 @@ export default class StringSource {
         // => container is <p>
         // <p><strong><Str /></strong></p>
         // => container is <strong>
-        const container = this.isParagraphNode(parent) ? node : parent;
+        const container = this.isParagraphNode(parent) ? newNode : parent;
         const rawValue = container.raw as string | undefined;
         if (rawValue === undefined) {
             return;
@@ -277,10 +304,10 @@ export default class StringSource {
         }
         let addedTokenMap = Object.assign({}, tokenMap);
         if (this.tokenMaps.length === 0) {
-            let textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
+            const textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
             addedTokenMap["generated"] = [0, textLength];
         } else {
-            let textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
+            const textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
             addedTokenMap["generated"] = [this.generatedString.length, this.generatedString.length + textLength];
         }
         this.generatedString += tokenMap.generatedValue;
@@ -290,15 +317,24 @@ export default class StringSource {
     /**
      * Compute text content of a node.  If the node itself
      * does not expose plain-text fields, `toString` will
-     * recursively mapping
+     * recursively map
      *
      * @param {Node} node - Node to transform to a string.
      * @param {Node} [parent] - Parent Node of the `node`.
+     * @param options
      */
-    private _stringify(node: TxtNode | TxtParentNode, parent?: TxtParentNode): void | StringSourceIR {
+    private _stringify({
+        node,
+        parent,
+        options
+    }: {
+        node: TxtNode | TxtParentNode;
+        parent?: TxtParentNode;
+        options: StringSourceOptions;
+    }): void | StringSourceIR {
         const isHTML = node.type === "Html";
         const currentNode = isHTML ? html2hast(node.value) : node;
-        const value = this._valueOf(currentNode, parent);
+        const value = this._valueOf({ node: currentNode, parent: parent, options });
         if (value) {
             return value;
         }
@@ -309,14 +345,10 @@ export default class StringSource {
             if (!isParentNode(node)) {
                 return;
             }
-            const tokenMap = this._stringify(childNode, node);
+            const tokenMap = this._stringify({ node: childNode, parent: node, options });
             if (tokenMap) {
                 this._addTokenMap(tokenMap);
             }
         });
     }
 }
-
-const isParentNode = (node: TxtNode | TxtParentNode): node is TxtParentNode => {
-    return "children" in node;
-};

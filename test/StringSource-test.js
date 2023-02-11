@@ -1,7 +1,7 @@
 // LICENSE : MIT
 "use strict";
 import assert from "assert";
-import { parse } from "markdown-to-ast";
+import { parse } from "@textlint/markdown-to-ast";
 import StringSource from "../src/StringSource";
 import { split as sentenceSplitter } from "sentence-splitter";
 
@@ -321,6 +321,44 @@ describe("StringSource", function () {
                 line: 1,
                 column: 23
             });
+        });
+    });
+    describe("replacer option", function () {
+        it("can modify specify node", function () {
+            const originalText = "This is `code`.";
+            const AST = parse(originalText);
+            const source = new StringSource(AST, {
+                replacer({ node, maskValue }) {
+                    if (node.type === "Code") {
+                        return maskValue("_");
+                    }
+                }
+            });
+            assert.strictEqual(source.toString(), "This is ____.");
+        });
+        it("should throw when maskValue character is 1>", function () {
+            const originalText = "This is `code`.";
+            const AST = parse(originalText);
+            assert.throws(() => {
+                const source = new StringSource(AST, {
+                    replacer({ node, maskValue }) {
+                        if (node.type === "Code") {
+                            return maskValue("xxx");
+                        }
+                    }
+                });
+            }, /maskSymbol should be single character/);
+        });
+        it("modify and get original index", function () {
+            const AST = parse("This is `TEST`.");
+            const source = new StringSource(AST, {
+                replacer({ node, emptyValue }) {
+                    if (node.type === "Code") {
+                        return emptyValue();
+                    }
+                }
+            });
+            assert.strictEqual(source.toString(), "This is .");
         });
     });
     describe("#originalPositionFromPosition", function () {

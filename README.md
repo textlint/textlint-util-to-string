@@ -12,65 +12,113 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Terminology
 
-The concepts `position` and `index` are the same as those explained in [Constellation/structured-source](https://github.com/Constellation/structured-source).
+The concepts `position` and `index` are the same as those explained in [TxtAST Interface · textlint](https://textlint.github.io/docs/txtnode.html) and [textlint/structured-source](https://github.com/textlint/structured-source).
 
-**Note**: the `column` property of `position` as it is **0-based** index.
+- `position` is a `{ line, column }` object.
+  - The `column` property of `position` is **0-based**.
+  - The `line` property of `position` is **1-based**.
+- `index` is an offset number.
+  - The `index` property is **0-based**.
 
-## Usage
+## API
 
-### `Constructor(rootNode): source`
+### `new StringSource(node: TxtParentNode, options?: StringSourceOptions)`
 
-Return instance of Source.
+Create new `StringSource` instance for `paragraph` Node.
 
-## `originalIndexFromIndex(generatedIndex): number | undefined`
+### `toString(): string`
+
+Get plain text from `Paragraph` Node.
+
+This plain text is concatenated from `value` of all children nodes of `Paragraph` Node.
+
+```ts
+import { StringSource } from "textlint-util-to-string";
+const report = function (context) {
+    const { Syntax, report, RuleError } = context;
+    return {
+        // "This is **a** `code`."
+        [Syntax.Paragraph](node) {
+            const source = new StringSource(node);
+            const text = source.toString(); // => "This is a code."
+        }
+    }
+};
+```
+
+In some cases, you may want to replace some characters in the plain text for avoiding false positives.
+You can replace `value` of children nodes by `options.replacer`.
+
+`options.replacer` is a function that takes a `node` and commands like `maskValue` or `emptyValue`.
+If you want to modify the `value` of the node, return command function calls.
+
+```ts
+// "This is a `code`."
+const source = new StringSource(paragraphNode, {
+    replacer({ node, maskValue }) {
+        if (node.type === Syntax.Code) {
+            return maskValue("_"); // code => ____
+        }
+    }
+});
+console.log(source.toString()); // => "This is a ____."
+```
+
+- `maskValue(character: string)`: mask the `value` of the node with the given `character`.
+- `emptyValue()`: replace the `value` of the node with an empty string.
+
+### `originalIndexFromIndex(generatedIndex): number | undefined`
 
 Get original index from generated index value
 
-## `originalPositionFromPosition(position): Position | undefined`
+### `originalPositionFromPosition(position): Position | undefined`
 
 Get original position from generated position
 
-## `originalIndexFromPosition(generatedPosition): number | undefined`
+### `originalIndexFromPosition(generatedPosition): number | undefined`
 
 Get original index from generated position
 
-## `originalPositionFromIndex(generatedIndex): Position | undefined`
+### `originalPositionFromIndex(generatedIndex): Position | undefined`
 
 Get original position from generated index
 
+## Examples
+
+Create plain text from `Paragraph` Node and get original position from plain text.
+
 ```js
-import assert from "assert"
-import {parse} from "markdown-to-ast";
-import {StringSource} from "textlint-util-to-string";
+import assert from "assert";
+import { StringSource } from "textlint-util-to-string";
+const report = function (context) {
+    const { Syntax, report, RuleError } = context;
+    return {
+        // "This is [Example！？](http://example.com/)"
+        [Syntax.Paragraph](node) {
+            const source = new StringSource(node);
+            const text = source.toString(); // => "This is Example！？"
+            // "Example" is located at the index 8 in the plain text
+            //  ^
+            const index1 = result.indexOf("Example");
+            assert.strictEqual(index1, 8);
+            // The "Example" is located at the index 9 in the original text
+            assert.strictEqual(source.originalIndexFromIndex(index1), 9);
+            assert.deepStrictEqual(source.originalPositionFromPosition({
+                line: 1,
+                column: 8
+            }), {
+                line: 1,
+                column: 9
+            });
 
-const originalText = "This is [Example！？](http://example.com/)";
-const AST = parse(originalText);
-const source = new StringSource(AST);
-const result = source.toString();
-
-// StringSource#toString returns a plain text
-assert.equal(result, "This is Example！？");
-
-// "Example" is located at the index 8 in the plain text
-//  ^
-let index1 = result.indexOf("Example");
-assert.equal(index1, 8);
-
-// The same "E" is located at the index 9 in the original text
-assert.equal(source.originalIndexFromIndex(index1), 9);
-assert.deepEqual(source.originalPositionFromPosition({
-    line: 1,
-    column: 8
-}), {
-    line: 1,
-    column: 9
-});
-
-// Another example with "！", which is located at 15 in the plain text
-// and at 16 in the original text
-let index2 = result.indexOf("！？");
-assert.equal(index2, 15);
-assert.equal(source.originalIndexFromIndex(index2), 16);
+            // Another example with "！？", which is located at 15 in the plain text
+            // and at 16 in the original text
+            const index2 = result.indexOf("！？");
+            assert.strictEqual(index2, 15);
+            assert.strictEqual(source.originalIndexFromIndex(index2), 16);
+        }
+    }
+};
 ```
 
 ## Examples
