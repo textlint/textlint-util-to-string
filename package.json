@@ -1,6 +1,6 @@
 {
   "name": "textlint-util-to-string",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "textlint utility that convert Paragraph Node to text with SourceMap.",
   "homepage": "https://github.com/textlint/textlint-util-to-string",
   "bugs": {
