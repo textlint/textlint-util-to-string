@@ -332,19 +332,30 @@ describe("StringSource", function () {
                     if (node.type === "Code") {
                         return maskValue("_");
                     }
-                    return;
                 }
             });
             assert.strictEqual(source.toString(), "This is ____.");
         });
+        it("should throw when maskValue character is 1>", function () {
+            const originalText = "This is `code`.";
+            const AST = parse(originalText);
+            assert.throws(() => {
+                const source = new StringSource(AST, {
+                    replacer({ node, maskValue }) {
+                        if (node.type === "Code") {
+                            return maskValue("xxx");
+                        }
+                    }
+                });
+            }, /maskSymbol should be single character/);
+        });
         it("modify and get original index", function () {
             const AST = parse("This is `TEST`.");
             const source = new StringSource(AST, {
-                replacer({ node, deleteNode }) {
+                replacer({ node, emptyValue }) {
                     if (node.type === "Code") {
-                        return deleteNode();
+                        return emptyValue();
                     }
-                    return;
                 }
             });
             assert.strictEqual(source.toString(), "This is .");

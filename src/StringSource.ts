@@ -4,6 +4,7 @@ import type { Node as UnistNode } from "unist";
 import unified from "unified";
 // @ts-expect-error no type definition
 import parse from "rehype-parse";
+import { emptyValue, handleReplacerCommand, maskValue, StringSourceReplacerCommand } from "./replacer";
 
 const isTxtNode = (node: unknown): node is TxtNode => {
     return typeof node === "object" && node !== null && "range" in node;
@@ -40,30 +41,7 @@ type StringSourceIR = {
     generatedValue: string;
     generated?: readonly [number, number];
 };
-export type StringSourceReplacerMaskValueCommand = {
-    type: "StringSourceReplacerMaskValueCommand";
-    maskSymbol: string;
-};
-export type StringSourceReplacerDeleteNodeCommand = {
-    type: "StringSourceReplacerDeleteNodeCommand";
-};
 
-export type StringSourceReplacerCommand = StringSourceReplacerMaskValueCommand | StringSourceReplacerDeleteNodeCommand;
-
-const maskValue = (maskSymbol: string): StringSourceReplacerMaskValueCommand => {
-    if (maskSymbol.length !== 1) {
-        throw new Error("maskSymbol should be single character");
-    }
-    return {
-        type: "StringSourceReplacerMaskValueCommand",
-        maskSymbol
-    };
-};
-const deleteNode = (): StringSourceReplacerDeleteNodeCommand => {
-    return {
-        type: "StringSourceReplacerDeleteNodeCommand"
-    };
-};
 export type StringSourceOptions = {
     replacer?: ({
         node,
@@ -72,7 +50,7 @@ export type StringSourceOptions = {
         node: TxtNode | UnistNode;
         parent?: TxtParentNode;
         maskValue: typeof maskValue;
-        deleteNode: typeof deleteNode;
+        emptyValue: typeof emptyValue;
     }) => StringSourceReplacerCommand | undefined;
 };
 export default class StringSource {
@@ -277,25 +255,8 @@ export default class StringSource {
         if (!node) {
             return;
         }
-        const replaceCommand = options?.replacer?.({ node, parent, maskValue, deleteNode });
-        const newNode = (() => {
-            if (!replaceCommand) {
-                return node;
-            }
-            if (replaceCommand.type === "StringSourceReplacerDeleteNodeCommand") {
-                return {
-                    ...node,
-                    value: ""
-                };
-            }
-            if (replaceCommand.type === "StringSourceReplacerMaskValueCommand") {
-                return {
-                    ...node,
-                    value: replaceCommand.maskSymbol.repeat(node.value.length)
-                };
-            }
-            return node;
-        })();
+        const replaceCommand = options?.replacer?.({ node, parent, maskValue, emptyValue });
+        const newNode = replaceCommand ? handleReplacerCommand(replaceCommand, node) : node;
         // [padding][value][padding]
         // =>
         // [value][value][value]
