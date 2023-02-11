@@ -26,7 +26,7 @@ Create new `StringSource` instance for `paragraph` Node.
 
 Get plain text from `Paragraph` Node.
 
-This plain text is concatenated from `value` of all children nodes ofr `Paragraph` Node.
+This plain text is concatenated from `value` of all children nodes of `Paragraph` Node.
 
 ```ts
 import { StringSource } from "textlint-util-to-string";
