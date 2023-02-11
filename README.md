@@ -1,8 +1,7 @@
 # textlint-util-to-string [![Actions Status: test](https://github.com/textlint/textlint-util-to-string/workflows/test/badge.svg)](https://github.com/textlint/textlint-util-to-string/actions?query=workflow%3A"test")
 
 Convert `Paragraph` Node to plain text with SourceMap.
-
-SourceMap mean that could revert `position` in plain text to `position` in Node.
+It means that you can get original position from plain text.
 
 This library is for [textlint](https://github.com/textlint/textlint "textlint") and [textstat](https://github.com/azu/textstat "textstat").
 
@@ -12,7 +11,7 @@ This library is for [textlint](https://github.com/textlint/textlint "textlint") 
 
 ## Terminology
 
-The concepts `position` and `index` are the same as those explained in [TxtAST Interface · textlint](https://textlint.github.io/docs/txtnode.html) and [textlint/structured-source](https://github.com/textlint/structured-source).
+The concepts `position` and `index` are the same with [TxtAST Interface](https://textlint.github.io/docs/txtnode.html) and [textlint/structured-source](https://github.com/textlint/structured-source).
 
 - `position` is a `{ line, column }` object.
   - The `column` property of `position` is **0-based**.
