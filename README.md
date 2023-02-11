@@ -56,7 +56,7 @@ If you want to modify the `value` of the node, return command function calls.
 // "This is a `code`."
 const source = new StringSource(paragraphNode, {
     replacer({ node, maskValue }) {
-        if (node.type === "Code") {
+        if (node.type === Syntax.Code) {
             return maskValue("_"); // code => ____
         }
     }
