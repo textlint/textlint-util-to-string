@@ -1,5 +1,5 @@
 import type { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
-import { StructuredSource, SourcePosition } from "structured-source";
+import { SourcePosition, StructuredSource } from "structured-source";
 import type { Node as UnistNode } from "unist";
 import unified from "unified";
 // @ts-expect-error no type definition
@@ -15,7 +15,7 @@ const html2hast = (html: string) => {
     return htmlProcessor.parse(html);
 };
 
-const isParentNode = (node: TxtNode | TxtParentNode): node is TxtParentNode => {
+const isParentNode = (node: TxtNode | StringSourceTxtParentNodeLikeNode): node is StringSourceTxtParentNodeLikeNode => {
     return "children" in node;
 };
 
@@ -48,19 +48,21 @@ export type StringSourceOptions = {
         parent
     }: {
         node: TxtNode | UnistNode;
-        parent?: TxtParentNode;
+        parent?: StringSourceTxtParentNodeLikeNode;
         maskValue: typeof maskValue;
         emptyValue: typeof emptyValue;
     }) => StringSourceReplacerCommand | undefined;
 };
-export default class StringSource {
-    private rootNode: TxtParentNode;
+export type StringSourceTxtParentNodeLikeNode = TxtParentNode | (Omit<TxtParentNode, "type"> & { type: string });
+
+export class StringSource {
+    private rootNode: StringSourceTxtParentNodeLikeNode;
     private generatedString: string;
     private originalSource: StructuredSource;
     private generatedSource: StructuredSource;
     private tokenMaps: StringSourceIR[];
 
-    constructor(node: TxtParentNode, options: StringSourceOptions = {}) {
+    constructor(node: StringSourceTxtParentNodeLikeNode, options: StringSourceOptions = {}) {
         this.rootNode = node;
         this.tokenMaps = [];
         this.generatedString = "";
@@ -201,7 +203,7 @@ export default class StringSource {
         return this.originalSource.indexToPosition(originalIndex);
     }
 
-    isParagraphNode(node: TxtNode): boolean {
+    isParagraphNode(node: TxtNode | StringSourceTxtParentNodeLikeNode): boolean {
         return node.type === "Paragraph";
     }
 
@@ -249,7 +251,7 @@ export default class StringSource {
         options
     }: {
         node: TxtNode | UnistNode;
-        parent?: TxtParentNode;
+        parent?: StringSourceTxtParentNodeLikeNode;
         options: StringSourceOptions;
     }): StringSourceIR | undefined {
         if (!node) {
@@ -328,8 +330,8 @@ export default class StringSource {
         parent,
         options
     }: {
-        node: TxtNode | TxtParentNode;
-        parent?: TxtParentNode;
+        node: TxtNode | StringSourceTxtParentNodeLikeNode;
+        parent?: StringSourceTxtParentNodeLikeNode;
         options: StringSourceOptions;
     }): void | StringSourceIR {
         const isHTML = node.type === "Html";

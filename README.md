@@ -120,7 +120,40 @@ const report = function (context) {
 };
 ```
 
-## Examples
+### Integration with sentence-splitter
+
+[sentence-splitter](https://github.com/textlint-rule/sentence-splitter) splits a paragraph into sentences.
+You can pass the Sentence node to `StringSource` to get the plain text of the sentence.
+
+```ts
+import assert from "assert";
+import { splitAST, SentenceSplitterSyntax } from "sentence-splitter";
+import { StringSource } from "textlint-util-to-string";
+import type { TextlintRuleModule } from "@textlint/types";
+const report: TextlintRuleModule<Options> = function (context) {
+    const { Syntax, report, RuleError } = context;
+    return {
+        // "First sentence. Second sentence."
+        [Syntax.Paragraph](node) {
+          // { children: [Sentence, WhiteSpace, Sentence] }
+          const sentenceRoot = splitAST(node);
+          // ["First sentence." node, "Second sentence." node]
+          const sentences = sentenceRoot.children.filter((node) => node.type === SentenceSplitterSyntax.Sentence);
+          for (const sentence of sentences) {
+            const sentenceSource = new StringSource(sentence);
+            const sentenceText = sentenceSource.toString();
+            console.log(sentenceText);
+            const sentenceIndex = sentenceText.indexOf("sentence");
+            const originalSentenceIndex = sentenceSource.originalIndexFromIndex(sentenceIndex);
+            console.log({ sentenceIndex, originalSentenceIndex });
+          }
+        }
+    }
+};
+export default report;
+```
+
+## Rules that use this library
 
 - [azu/textlint-rule-first-sentence-length: textlint rule that limit maximum length of First sentence of the section.](https://github.com/azu/textlint-rule-first-sentence-length)
 - [azu/textlint-rule-en-max-word-count: textlint rule that specify the maximum word count of a sentence.](https://github.com/azu/textlint-rule-en-max-word-count)

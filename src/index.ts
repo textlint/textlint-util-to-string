@@ -1,3 +1,1 @@
-import StringSource from "./StringSource";
-
-export { StringSource };
+export { StringSource } from "./StringSource";
