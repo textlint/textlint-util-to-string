@@ -2,7 +2,7 @@
 "use strict";
 import assert from "assert";
 import { parse } from "@textlint/markdown-to-ast";
-import StringSource from "../src/StringSource";
+import { StringSource } from "../src/StringSource";
 import { split as sentenceSplitter } from "sentence-splitter";
 
 describe("StringSource", function () {

@@ -1,7 +1,8 @@
 // LICENSE : MIT
 "use strict";
 import assert from "assert";
-import StringSource from "../src/StringSource";
+import { StringSource } from "../src/StringSource";
+
 describe("StringSource AST", function () {
     describe("#toString", function () {
         it("should concat string", function () {
