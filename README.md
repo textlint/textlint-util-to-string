@@ -155,9 +155,9 @@ export default report;
 
 ## Rules that use this library
 
-- [azu/textlint-rule-first-sentence-length: textlint rule that limit maximum length of First sentence of the section.](https://github.com/azu/textlint-rule-first-sentence-length)
-- [azu/textlint-rule-en-max-word-count: textlint rule that specify the maximum word count of a sentence.](https://github.com/azu/textlint-rule-en-max-word-count)
-- [nodaguti/textlint-rule-spellchecker: textlint rule to check spellings with native spellchecker](https://github.com/nodaguti/textlint-rule-spellchecker)
+- [textlint-rule-first-sentence-length: textlint rule that limit maximum length of First sentence of the section.](https://github.com/textlint-rule/textlint-rule-first-sentence-length)
+- [textlint-rule-en-max-word-count: textlint rule that specify the maximum word count of a sentence.](https://github.com/textlint-rule/textlint-rule-en-max-word-count)
+- [textlint-rule-spellchecker: textlint rule to check spellings with native spellchecker](https://github.com/nodaguti/textlint-rule-spellchecker)
 
 
 ## FAQ
@@ -174,6 +174,10 @@ source.originalIndexFor(0); // should be 0
 To return relative position easy to compute position(We think).
 
 One space has a single absolute position, The other should be relative position.
+
+## Related Libraries
+
+- <https://github.com/textlint/textlint/wiki/Collection-of-textlint-rule#rule-libraries>
 
 ## Tests
 
