@@ -1,10 +1,10 @@
 import type { TxtHtmlNode, TxtNode, TxtNodeLocation, TxtNodeRange } from "@textlint/ast-node-types";
 import { SourcePosition, StructuredSource } from "structured-source";
-import type { Node as UnistNode } from "unist";
 import unified from "unified";
 // @ts-expect-error no type definition
 import parse from "rehype-parse";
 import { emptyValue, handleReplacerCommand, maskValue, StringSourceReplacerCommand } from "./replacer";
+import { UnistNode } from "./UnistNode";
 
 const isTxtNode = (node: unknown): node is TxtNode => {
     return typeof node === "object" && node !== null && "range" in node;
@@ -311,7 +311,7 @@ export class StringSource {
         // <p><strong><Str /></strong></p>
         // => container is <strong>
         const container = this.isParagraphNode(parent) ? newNode : parent;
-        const rawValue = container.raw as string | undefined;
+        const rawValue = "raw" in container ? container.raw : undefined;
         if (rawValue === undefined) {
             return;
         }
