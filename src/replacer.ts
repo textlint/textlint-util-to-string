@@ -34,7 +34,7 @@ export const handleReplacerCommand = <T extends TxtNode | UnistNode>(
         return node;
     }
     if (command.type === "StringSourceReplacerEmptyValueCommand") {
-        if (node.value === undefined) {
+        if (!("value" in node)) {
             return node;
         }
         return {
@@ -42,7 +42,7 @@ export const handleReplacerCommand = <T extends TxtNode | UnistNode>(
             value: ""
         };
     } else if (command.type === "StringSourceReplacerMaskValueCommand") {
-        if (node.value === undefined) {
+        if (!("value" in node) || typeof node.value !== "string") {
             throw new Error(
                 `Can not masking. ${node.type} node does not have value property: ` + JSON.stringify(node, null, 4)
             );

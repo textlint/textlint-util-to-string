@@ -1,4 +1,4 @@
-import type { TxtNode, TxtParentNode } from "@textlint/ast-node-types";
+import type { TxtHtmlNode, TxtNode, TxtNodeLocation, TxtNodeRange } from "@textlint/ast-node-types";
 import { SourcePosition, StructuredSource } from "structured-source";
 import type { Node as UnistNode } from "unist";
 import unified from "unified";
@@ -9,13 +9,17 @@ import { emptyValue, handleReplacerCommand, maskValue, StringSourceReplacerComma
 const isTxtNode = (node: unknown): node is TxtNode => {
     return typeof node === "object" && node !== null && "range" in node;
 };
-
+const isHtmlNode = (node: StringSourceTxtParentNodeLikeNode | StringSourceTxtTxtNode): node is TxtHtmlNode => {
+    return node.type === "Html";
+};
 const htmlProcessor = unified().use(parse, { fragment: true });
 const html2hast = (html: string) => {
     return htmlProcessor.parse(html);
 };
 
-const isParentNode = (node: TxtNode | StringSourceTxtParentNodeLikeNode): node is StringSourceTxtParentNodeLikeNode => {
+const isParentNode = (
+    node: UnistNode | TxtNode | StringSourceTxtParentNodeLikeNode
+): node is StringSourceTxtParentNodeLikeNode => {
     return "children" in node;
 };
 
@@ -53,7 +57,28 @@ export type StringSourceOptions = {
         emptyValue: typeof emptyValue;
     }) => StringSourceReplacerCommand | undefined;
 };
-export type StringSourceTxtParentNodeLikeNode = TxtParentNode | (Omit<TxtParentNode, "type"> & { type: string });
+/**
+ * TxtTxtNode-like definition
+ * It is intentionally loose definition to accept sentences-splitter's node and unist node.
+ */
+export type StringSourceTxtTxtNode = {
+    type: string;
+    raw: string;
+    range: TxtNodeRange;
+    loc: TxtNodeLocation;
+    value?: string | null | undefined;
+};
+/**
+ * TxtParentNode-like definition
+ * It is intentionally loose definition to accept sentences-splitter's node and unist node.
+ */
+export type StringSourceTxtParentNodeLikeNode = {
+    type: string;
+    raw: string;
+    range: TxtNodeRange;
+    loc: TxtNodeLocation;
+    children: (StringSourceTxtTxtNode | StringSourceTxtParentNodeLikeNode)[];
+};
 
 export class StringSource {
     private rootNode: StringSourceTxtParentNodeLikeNode;
@@ -218,13 +243,17 @@ export class StringSource {
      * @private
      */
     private _getValue(node: TxtNode | UnistNode): string | undefined {
-        if (node.value) {
+        if ("value" in node && typeof node.value === "string") {
             return node.value;
-        } else if (node.alt) {
+        } else if ("alt" in node && typeof node.alt === "string") {
             return node.alt;
-        } else if (node.title) {
+        } else if ("title" in node) {
+            // Ignore link title e.g.) [text](url "title")
             // See https://github.com/azu/textlint-rule-sentence-length/issues/6
             if (node.type === "Link") {
+                return;
+            }
+            if (typeof node.title !== "string") {
                 return;
             }
             return node.title;
@@ -330,24 +359,27 @@ export class StringSource {
         parent,
         options
     }: {
-        node: TxtNode | StringSourceTxtParentNodeLikeNode;
+        node: StringSourceTxtParentNodeLikeNode | StringSourceTxtTxtNode;
         parent?: StringSourceTxtParentNodeLikeNode;
         options: StringSourceOptions;
     }): void | StringSourceIR {
-        const isHTML = node.type === "Html";
-        const currentNode = isHTML ? html2hast(node.value) : node;
+        const currentNode = isHtmlNode(node) ? html2hast(node.value) : node;
         const value = this._valueOf({ node: currentNode, parent: parent, options });
         if (value) {
             return value;
         }
-        if (!isParentNode(node)) {
+        if (!isParentNode(currentNode)) {
             return;
         }
-        currentNode.children.forEach((childNode: TxtNode) => {
+        currentNode.children.forEach((childNode) => {
             if (!isParentNode(node)) {
                 return;
             }
-            const tokenMap = this._stringify({ node: childNode, parent: node, options });
+            const tokenMap = this._stringify({
+                node: childNode,
+                parent: node,
+                options
+            });
             if (tokenMap) {
                 this._addTokenMap(tokenMap);
             }
