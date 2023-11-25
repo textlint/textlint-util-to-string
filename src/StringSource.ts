@@ -1,4 +1,4 @@
-import type { TxtHtmlNode, TxtNode, TxtNodeLocation, TxtNodeRange } from "@textlint/ast-node-types";
+import type { TxtHtmlNode, TxtNode, TxtNodeLocation, TxtNodeRange, TxtParagraphNode } from "@textlint/ast-node-types";
 import { SourcePosition, StructuredSource } from "structured-source";
 import unified from "unified";
 // @ts-expect-error no type definition
@@ -228,7 +228,7 @@ export class StringSource {
         return this.originalSource.indexToPosition(originalIndex);
     }
 
-    isParagraphNode(node: TxtNode | StringSourceTxtParentNodeLikeNode): boolean {
+    isParagraphNode(node: TxtNode | StringSourceTxtParentNodeLikeNode): node is TxtParagraphNode {
         return node.type === "Paragraph";
     }
 
