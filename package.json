@@ -28,7 +28,8 @@
   "scripts": {
     "build": "microbundle --external none",
     "prepublish": "npm run --if-present build",
-    "test": "mocha \"test/**/*.{js,ts}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && mocha \"test/**/*.{js,ts}\"",
     "watch": "tsc -p . --watch",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\"",
     "prepare": "git config --local core.hooksPath .githooks"

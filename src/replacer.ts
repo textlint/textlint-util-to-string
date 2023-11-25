@@ -1,5 +1,5 @@
 import { TxtNode } from "@textlint/ast-node-types";
-import { Node as UnistNode } from "unist";
+import { UnistNode } from "./UnistNode";
 
 export type StringSourceReplacerMaskValueCommand = {
     type: "StringSourceReplacerMaskValueCommand";
