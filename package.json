@@ -35,13 +35,13 @@
     "prepare": "git config --local core.hooksPath .githooks"
   },
   "dependencies": {
-    "@textlint/ast-node-types": "^13.4.1",
+    "@textlint/ast-node-types": "^15.8.0",
     "rehype-parse": "^6.0.1",
     "structured-source": "^4.0.0",
     "unified": "^8.4.0"
   },
   "devDependencies": {
-    "@textlint/markdown-to-ast": "^13.4.1",
+    "@textlint/markdown-to-ast": "^15.8.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.0",
     "cross-env": "^7.0.3",
