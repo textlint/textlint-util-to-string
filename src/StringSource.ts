@@ -77,7 +77,7 @@ export type StringSourceTxtParentNodeLikeNode = {
     raw: string;
     range: TxtNodeRange;
     loc: TxtNodeLocation;
-    children: (StringSourceTxtTxtNode | StringSourceTxtParentNodeLikeNode)[];
+    children: readonly (StringSourceTxtTxtNode | StringSourceTxtParentNodeLikeNode)[];
 };
 
 export class StringSource {
