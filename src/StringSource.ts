@@ -83,8 +83,8 @@ export type StringSourceTxtParentNodeLikeNode = {
 export class StringSource {
     private rootNode: StringSourceTxtParentNodeLikeNode;
     private generatedString: string;
-    private originalSource: StructuredSource;
-    private generatedSource: StructuredSource;
+    private _originalSource: StructuredSource | undefined;
+    private _generatedSource: StructuredSource | undefined;
     private tokenMaps: StringSourceIR[];
 
     constructor(node: StringSourceTxtParentNodeLikeNode, options: StringSourceOptions = {}) {
@@ -93,8 +93,22 @@ export class StringSource {
         this.generatedString = "";
         // pre calculate
         this._stringify({ node: this.rootNode, options });
-        this.originalSource = new StructuredSource(this.rootNode.raw);
-        this.generatedSource = new StructuredSource(this.generatedString);
+    }
+
+    // StructuredSource builds a line index of the whole text.
+    // Create it on first use, because toString() and originalIndexFromIndex() do not need it.
+    private get originalSource(): StructuredSource {
+        if (this._originalSource === undefined) {
+            this._originalSource = new StructuredSource(this.rootNode.raw);
+        }
+        return this._originalSource;
+    }
+
+    private get generatedSource(): StructuredSource {
+        if (this._generatedSource === undefined) {
+            this._generatedSource = new StructuredSource(this.generatedString);
+        }
+        return this._generatedSource;
     }
 
     toString() {
@@ -127,25 +141,29 @@ export class StringSource {
      * @returns {number|undefined} original
      */
     originalIndexFromIndex(generatedIndex: number, isEnd = false) {
-        const hitTokenMaps = this.tokenMaps.filter((tokenMap, index) => {
-            const generated = tokenMap.generated;
-            const nextTokenMap = this.tokenMaps[index + 1];
-            const nextGenerated = nextTokenMap ? nextTokenMap.generated : null;
+        // Find the first and the last token map that contains generatedIndex,
+        // without creating an array of the hit token maps.
+        const tokenMaps = this.tokenMaps;
+        let firstHitTokenMap: StringSourceIR | undefined;
+        let lastHitTokenMap: StringSourceIR | undefined;
+        for (let index = 0; index < tokenMaps.length; index++) {
+            const generated = tokenMaps[index].generated;
             if (!generated) {
-                return false;
+                continue;
             }
-            if (nextGenerated) {
-                if (generated[0] <= generatedIndex && generatedIndex <= nextGenerated[0]) {
-                    return true;
+            const nextTokenMap = tokenMaps[index + 1];
+            const nextGenerated = nextTokenMap ? nextTokenMap.generated : null;
+            const isHit = nextGenerated
+                ? generated[0] <= generatedIndex && generatedIndex <= nextGenerated[0]
+                : generated[0] <= generatedIndex && generatedIndex <= generated[1];
+            if (isHit) {
+                if (firstHitTokenMap === undefined) {
+                    firstHitTokenMap = tokenMaps[index];
                 }
-            } else {
-                if (generated[0] <= generatedIndex && generatedIndex <= generated[1]) {
-                    return true;
-                }
+                lastHitTokenMap = tokenMaps[index];
             }
-            return false;
-        });
-        if (hitTokenMaps.length === 0) {
+        }
+        if (firstHitTokenMap === undefined || lastHitTokenMap === undefined) {
             return;
         }
 
@@ -159,7 +177,7 @@ export class StringSource {
          * If isEnd is false, generatedIndex is index of ABC node.
          */
 
-        const hitTokenMap = isEnd ? hitTokenMaps[0] : hitTokenMaps[hitTokenMaps.length - 1];
+        const hitTokenMap = isEnd ? firstHitTokenMap : lastHitTokenMap;
         // <----------->[<------------->|text]
         //              ^        ^
         //   position-generated  intermediate-origin
@@ -333,14 +351,16 @@ export class StringSource {
         if (tokenMap == null) {
             return;
         }
-        let addedTokenMap = Object.assign({}, tokenMap);
-        if (this.tokenMaps.length === 0) {
-            const textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
-            addedTokenMap["generated"] = [0, textLength];
-        } else {
-            const textLength = addedTokenMap.intermediate[1] - addedTokenMap.intermediate[0];
-            addedTokenMap["generated"] = [this.generatedString.length, this.generatedString.length + textLength];
-        }
+        const textLength = tokenMap.intermediate[1] - tokenMap.intermediate[0];
+        // generatedString is empty when tokenMaps is empty
+        const generatedStart = this.tokenMaps.length === 0 ? 0 : this.generatedString.length;
+        // Same keys and order as Object.assign({}, tokenMap) + generated
+        const addedTokenMap: StringSourceIR = {
+            original: tokenMap.original,
+            intermediate: tokenMap.intermediate,
+            generatedValue: tokenMap.generatedValue,
+            generated: [generatedStart, generatedStart + textLength]
+        };
         this.generatedString += tokenMap.generatedValue;
         this.tokenMaps.push(addedTokenMap);
     }
@@ -371,18 +391,19 @@ export class StringSource {
         if (!isParentNode(currentNode)) {
             return;
         }
-        currentNode.children.forEach((childNode) => {
-            if (!isParentNode(node)) {
-                return;
-            }
+        if (!isParentNode(node)) {
+            return;
+        }
+        const children = currentNode.children;
+        for (let i = 0; i < children.length; i++) {
             const tokenMap = this._stringify({
-                node: childNode,
+                node: children[i],
                 parent: node,
                 options
             });
             if (tokenMap) {
                 this._addTokenMap(tokenMap);
             }
-        });
+        }
     }
 }
