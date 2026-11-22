@@ -176,8 +176,8 @@ importers:
   .:
     dependencies:
       '@textlint/ast-node-types':
-        specifier: ^15.8.0
-        version: 15.8.0
+        specifier: ^16.1.2
+        version: 16.1.2
       rehype-parse:
         specifier: ^6.0.1
         version: 6.0.2
@@ -930,6 +930,9 @@ packages:
   '@textlint/ast-node-types@15.8.0':
     resolution: {integrity: sha512-5CiH9COYmovWmExQgs7763DzX6Gy9zjkjJ7JxCC95wyTcjwQn/8poNF6fv3qzRlmx8CRRde8DHr9FcgAAiPzgw==}
 
+  '@textlint/ast-node-types@16.1.2':
+    resolution: {integrity: sha512-++pb7qwrQAZrvqyhDEmRCgRHTGiYYR3HOcKmiNMhFOkDFZ+YUYcRxRWKLTcktv4Rw8xQn3NBHnIGw9hIVH9RCw==}
+
   '@textlint/markdown-to-ast@15.8.0':
     resolution: {integrity: sha512-gWOcd2+UCqODMLGIIY5WiPE9zmR9L4aut3FIkxH8gSCiZ6EVkBaU2mgm+8KiGOjJqdtT98xkWocCwDtQ1kypOQ==}
 
@@ -958,8 +961,8 @@ packages:
   '@types/estree@0.0.45':
     resolution: {integrity: sha512-jnqIUKDUqJbDIUxm0Uj7bnlMnRm1T/eZ9N+AVMqhPgzrba2GhGG5o/jCTwmdPK709nEZsGoMzXEDUjcXHa3W0g==}
 
-  '@types/mdast@3.0.10':
-    resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
+  '@types/mdast@3.0.15':
+    resolution: {integrity: sha512-LnwD+mUEfxWMa1QpDraczIn6k0Ee3SMicuYSSzS6ZYl2gKS09EClnJYGd8Du6rfc5r/GZEk5o1mRb8TaTj03sQ==}
 
   '@types/mocha@10.0.6':
     resolution: {integrity: sha512-dJvrYWxP/UcXm36Qn36fxhUKu8A/xMRXVT2cliFF1Z7UA9liG5Psj3ezNSZw+5puH2czDXRLcXQxf8JbJt0ejg==}
@@ -3768,6 +3771,8 @@ snapshots:
 
   '@textlint/ast-node-types@15.8.0': {}
 
+  '@textlint/ast-node-types@16.1.2': {}
+
   '@textlint/markdown-to-ast@15.8.0(supports-color@8.1.1)':
     dependencies:
       '@textlint/ast-node-types': 15.8.0
@@ -3799,7 +3804,7 @@ snapshots:
 
   '@types/estree@0.0.45': {}
 
-  '@types/mdast@3.0.10':
+  '@types/mdast@3.0.15':
     dependencies:
       '@types/unist': 2.0.6
 
@@ -4768,7 +4773,7 @@ snapshots:
 
   mdast-util-from-markdown@0.8.5(supports-color@8.1.1):
     dependencies:
-      '@types/mdast': 3.0.10
+      '@types/mdast': 3.0.15
       mdast-util-to-string: 2.0.0
       micromark: 2.11.4(supports-color@8.1.1)
       parse-entities: 2.0.0
